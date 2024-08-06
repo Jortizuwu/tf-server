@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+
+  # postgresql container
+  db_postgres:
+    image: postgres
+    container_name: postgres_db
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - type_figth_network
+
+  # pgadmin container
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - ${PGADMIN_PORT}:80
+    depends_on:
+      - db_postgres
+    networks:
+      - type_figth_network
+
+volumes:
+  postgresdata:
+
+networks:
+  type_figth_network:
+    driver: bridge
