@@ -6,11 +6,11 @@ spring:
     database: POSTGRESQL
     show-sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 
   datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/todo
+    url: jdbc:postgresql://localhost:5432/user
     username: postgres
     password: postgres
     driverClassName: org.postgresql.Driver
