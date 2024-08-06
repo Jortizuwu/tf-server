@@ -1,18 +1,41 @@
-package com.typefigth.user.domain.models.user;
+package com.typefigth.user.infrastructure.entities.user;
+
+
+import com.typefigth.user.domain.models.user.User;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-public class User {
+@Entity
+@Table(name = "user")
+public class UserEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String uid;
     private String nickname;
     private String password;
     private String email;
     private String name;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public User(String uid, String nickname, String password, String email, String name, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    @PrePersist
+    private void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public UserEntity(String uid, String nickname, String password, String email, String name, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.uid = uid;
         this.nickname = nickname;
         this.password = password;
@@ -22,7 +45,7 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    public User() {
+    public UserEntity() {
     }
 
     public String getUid() {
@@ -45,12 +68,12 @@ public class User {
         return name;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
     public void setUid(String uid) {
@@ -61,12 +84,12 @@ public class User {
         this.nickname = nickname;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setName(String name) {
@@ -81,8 +104,9 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
-    // builder
-    public static class UserBuilder {
+    // build
+    public static class UserEntityBuilder {
+
         private String uid;
         private String nickname;
         private String password;
@@ -91,44 +115,43 @@ public class User {
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
-        public UserBuilder setUid(String uid) {
+        public UserEntityBuilder setUid(String uid) {
             this.uid = uid;
             return this;
         }
 
-        public UserBuilder setNickname(String nickname) {
+        public UserEntityBuilder setNickname(String nickname) {
             this.nickname = nickname;
             return this;
         }
 
-        public UserBuilder setPassword(String password) {
+        public UserEntityBuilder setPassword(String password) {
             this.password = password;
             return this;
         }
 
-        public UserBuilder setEmail(String email) {
+        public UserEntityBuilder setEmail(String email) {
             this.email = email;
             return this;
         }
 
-        public UserBuilder setName(String name) {
+        public UserEntityBuilder setName(String name) {
             this.name = name;
             return this;
         }
 
-        public UserBuilder setCreatedAt(LocalDateTime createdAt) {
+        public UserEntityBuilder setCreatedAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
         }
 
-        public UserBuilder setUpdatedAt(LocalDateTime updatedAt) {
+        public UserEntityBuilder setUpdatedAt(LocalDateTime updatedAt) {
             this.updatedAt = updatedAt;
             return this;
         }
 
-        public User build() {
-            return new User(uid, nickname, password, email, name, createdAt, updatedAt);
+        public UserEntity build() {
+            return new UserEntity(uid, nickname, password, email, name, createdAt, updatedAt);
         }
     }
-
 }

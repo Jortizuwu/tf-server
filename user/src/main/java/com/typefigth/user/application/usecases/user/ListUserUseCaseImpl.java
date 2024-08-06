@@ -10,7 +10,7 @@ public class ListUserUseCaseImpl implements ListUserUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
 
-    ListUserUseCaseImpl(UserRepositoryPort userRepositoryPort) {
+    public ListUserUseCaseImpl(UserRepositoryPort userRepositoryPort) {
         this.userRepositoryPort = userRepositoryPort;
     }
 

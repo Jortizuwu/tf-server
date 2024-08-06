@@ -7,7 +7,7 @@ public class DeleteUserUseCaseImpl implements DeleteUserUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
 
-    DeleteUserUseCaseImpl(UserRepositoryPort userRepositoryPort) {
+    public DeleteUserUseCaseImpl(UserRepositoryPort userRepositoryPort) {
         this.userRepositoryPort = userRepositoryPort;
     }
 

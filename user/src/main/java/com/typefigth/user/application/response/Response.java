@@ -1,4 +1,4 @@
-package com.typefigth.user.application.response.user;
+package com.typefigth.user.application.response;
 
 public class Response {
 
