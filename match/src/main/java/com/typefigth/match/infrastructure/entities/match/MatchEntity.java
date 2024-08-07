@@ -1,20 +1,42 @@
-package com.typefigth.match.domain.models;
+package com.typefigth.match.infrastructure.entities.match;
+
+
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-public class Match {
+@Entity
+@Table(name = "matches")
+public class MatchEntity {
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Match(String id, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    @PrePersist
+    private void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public MatchEntity(String id, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public Match() {
+    public MatchEntity() {
     }
 
     public String getId() {
@@ -62,8 +84,8 @@ public class Match {
             return this;
         }
 
-        public Match build() {
-            return new Match(id, createdAt, updatedAt);
+        public MatchEntity build() {
+            return new MatchEntity(id, createdAt, updatedAt);
         }
     }
 }
