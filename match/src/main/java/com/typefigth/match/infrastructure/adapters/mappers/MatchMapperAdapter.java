@@ -10,6 +10,7 @@ public class MatchMapperAdapter implements MatchMapper {
                 .setId(match.getId())
                 .setCreatedAt(match.getCreatedAt())
                 .setUpdatedAt(match.getUpdatedAt())
+                .setOwnId(match.getOwnId())
                 .build();
 
     }
@@ -19,6 +20,7 @@ public class MatchMapperAdapter implements MatchMapper {
                 .setId(entity.getId())
                 .setCreatedAt(entity.getCreatedAt())
                 .setUpdatedAt(entity.getUpdatedAt())
+                .setOwnId(entity.getOwnId())
                 .build();
     }
 }

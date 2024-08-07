@@ -1,17 +1,17 @@
 package com.typefigth.match.application.response;
 
-public class Response {
+public class Response<T> {
 
     private int code;
     private String path;
     private boolean success;
-    private Object data;
+    private T data;
     private boolean isArray;
     private String ip;
     private String message;
     private String status;
 
-    public Response(int code, String path, boolean success, Object data, boolean isArray, String ip, String message, String status) {
+    public Response(int code, String path, boolean success, T data, boolean isArray, String ip, String message, String status) {
         this.code = code;
         this.path = path;
         this.success = success;
@@ -49,11 +49,11 @@ public class Response {
         this.success = success;
     }
 
-    public Object getData() {
+    public T getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(T data) {
         this.data = data;
     }
 
@@ -89,7 +89,21 @@ public class Response {
         this.status = status;
     }
 
-    public static Response build(int code, String path, boolean success, Object data, boolean isArray, String ip, String message, String status) {
-        return new Response(code, path, success, data, isArray, ip, message, status);
+    public static <T> Response<T> build(int code, String path, boolean success, T data, boolean isArray, String ip, String message, String status) {
+        return new Response<>(code, path, success, data, isArray, ip, message, status);
+    }
+
+    @Override
+    public String toString() {
+        return "Response{" +
+                "code=" + code +
+                ", path='" + path + '\'' +
+                ", success=" + success +
+                ", data=" + data +
+                ", isArray=" + isArray +
+                ", ip='" + ip + '\'' +
+                ", message='" + message + '\'' +
+                ", status='" + status + '\'' +
+                '}';
     }
 }

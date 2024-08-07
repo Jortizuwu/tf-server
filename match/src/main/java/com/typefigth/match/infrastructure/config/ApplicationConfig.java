@@ -5,14 +5,21 @@ import com.typefigth.match.application.usecases.match.CreateMatchUseCaseImpl;
 import com.typefigth.match.application.usecases.match.GetMatchUseCaseImpl;
 import com.typefigth.match.application.usecases.match.ListMatchUseCaseImpl;
 import com.typefigth.match.domain.ports.out.match.MatchRepositoryPort;
-import com.typefigth.match.infrastructure.adapters.JpaMatchRepositoryAdapter;
 import com.typefigth.match.infrastructure.adapters.mappers.MatchMapper;
 import com.typefigth.match.infrastructure.adapters.mappers.MatchMapperAdapter;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
 
-@Configurable
+@Configuration
 public class ApplicationConfig {
+
+    @Bean
+    public WebClient webClient(WebClient.Builder builder) {
+        return builder
+                .baseUrl("http://localhost:8080")
+                .build();
+    }
 
     @Bean
     public MatchService matchService(MatchRepositoryPort matchRepositoryPort) {
@@ -22,10 +29,10 @@ public class ApplicationConfig {
                 new ListMatchUseCaseImpl(matchRepositoryPort));
     }
 
-    @Bean
-    public MatchRepositoryPort matchRepository(JpaMatchRepositoryAdapter jpaMatchRepositoryAdapter) {
-        return jpaMatchRepositoryAdapter;
-    }
+//    @Bean
+//    public MatchRepositoryPort matchRepository(JpaMatchRepositoryAdapter jpaMatchRepositoryAdapter) {
+//        return jpaMatchRepositoryAdapter;
+//    }
 
     @Bean
     public MatchMapper matchMapper() {
