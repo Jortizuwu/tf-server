@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MatchRepositoryPort {
-    Optional<Match> getMatch(String id);
+    Optional<Match> findById(String id);
 
-    List<Match> listMatch(String id);
+    List<Match> listMatch();
 
-    Math createMatch(Match match);
+    Match createMatch(Match match);
 }
