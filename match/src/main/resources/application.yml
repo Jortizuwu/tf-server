@@ -1,0 +1,20 @@
+server:
+  port: 8081
+
+spring:
+  jpa:
+    database: MYSQL
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/match
+    username: root
+    password: 123456
+    driver: com.mysql.cj.jdbc.Driver
+
+  application:
+    name: MATCH-SERVICE
+
+

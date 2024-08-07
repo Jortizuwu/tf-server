@@ -15,3 +15,7 @@ spring:
     password: postgres
     driverClassName: org.postgresql.Driver
 
+  application:
+    name: USER-SERVICE
+
+

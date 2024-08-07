@@ -19,6 +19,8 @@
 
     <modules>
         <module>user</module>
+        <module>discovery-server</module>
+        <module>match</module>
     </modules>
 
     <properties>
