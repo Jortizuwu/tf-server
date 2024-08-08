@@ -1,5 +1,6 @@
 package com.typefigth.match.infrastructure.controller;
 
+import com.typefigth.match.application.dtos.match.MatchDto;
 import com.typefigth.match.application.response.Response;
 import com.typefigth.match.application.services.match.MatchService;
 import com.typefigth.match.domain.models.Match;
@@ -7,14 +8,15 @@ import com.typefigth.match.domain.models.User;
 import com.typefigth.match.infrastructure.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/match")
@@ -22,7 +24,7 @@ public class MatchController {
 
     private final MatchService matchService;
 
-    private final Logger logger = org.slf4j.LoggerFactory.getLogger(MatchController.class);
+    private final Logger logger = LoggerFactory.getLogger(MatchController.class);
 
     private final WebClient webClient;
 
@@ -32,34 +34,53 @@ public class MatchController {
     }
 
     @GetMapping()
-    public ResponseEntity<Response<List<Match>>> listMatches(HttpServletRequest request) {
-        ParameterizedTypeReference<Response<User>> responseType = new ParameterizedTypeReference<Response<User>>() {
-        };
+    public ResponseEntity<Response<List<MatchDto>>> listMatches(HttpServletRequest request) {
 
-        List<Match> matches = this.matchService.listMatch().stream().map(value -> {
-            Response<User> userResponse = this.webClient.get().uri("/user/" + value.getOwnId()).retrieve().bodyToMono(responseType).block();
+        List<MatchDto> matches = this.matchService.listMatch().stream().map(value -> this.createMatchDtoWithOwn(value, value.getOwnId())).toList();
 
-            if (userResponse != null && userResponse.getData() != null) {
-                value.setUser(userResponse.getData());
-            }
-            return value;
-        }).toList();
+        Response<List<MatchDto>> response = Response.build(
+                200,
+                request.getContextPath(),
+                true, matches,
+                false,
+                getClientIp(request),
+                "OK",
+                HttpStatus.OK.toString());
 
-        Response<List<Match>> response = Response.build(200, request.getContextPath(), true, matches, false, getClientIp(request), "OK", HttpStatus.OK.toString());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Response> getMatch(@PathVariable String id, HttpServletRequest request) {
+    public ResponseEntity<Response<MatchDto>> getMatch(@PathVariable String id, HttpServletRequest request) {
         Match match = this.matchService.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("error match with id: %s not found", id)));
-        Response response = Response.build(200, request.getContextPath(), true, match, false, getClientIp(request), "OK", HttpStatus.OK.toString());
+
+        MatchDto matchDto = createMatchDtoWithOwn(match, match.getOwnId());
+
+        Response<MatchDto> response = Response.build(200,
+                request.getContextPath(),
+                true,
+                matchDto,
+                false,
+                getClientIp(request),
+                "OK",
+                HttpStatus.OK.toString());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping
-    public ResponseEntity<Response> createMatch(@RequestBody Match body, HttpServletRequest request) {
+    public ResponseEntity<Response<MatchDto>> createMatch(@RequestBody Match body, HttpServletRequest request) {
         Match newMatch = this.matchService.createMatch(body);
-        Response response = Response.build(200, request.getContextPath(), true, newMatch, false, getClientIp(request), "OK", HttpStatus.OK.toString());
+
+        MatchDto matchDto = createMatchDtoWithOwn(newMatch, body.getOwnId());
+
+        Response<MatchDto> response = Response.build(200,
+                request.getContextPath(),
+                true,
+                matchDto,
+                false,
+                getClientIp(request),
+                "OK",
+                HttpStatus.OK.toString());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -74,5 +95,29 @@ public class MatchController {
         }
 
         return remoteAddr;
+    }
+
+    private MatchDto createMatchDtoWithOwn(Match match, String id) {
+        ParameterizedTypeReference<Response<User>> responseType = new ParameterizedTypeReference<>() {
+        };
+
+        MatchDto matchDto = new MatchDto(match.getId(), match.getOwnId(), null, match.getCreatedAt(), match.getUpdatedAt());
+
+        Response<User> userResponse = this.webClient
+                .get()
+                .uri("/user/" + id)
+                .retrieve()
+                .bodyToMono(responseType)
+                .onErrorResume(this::apply).block();
+
+        if (userResponse != null && userResponse.getData() != null) {
+            matchDto.setOwn(userResponse.getData());
+        }
+        return matchDto;
+    }
+
+    private Mono<? extends Response<User>> apply(Throwable e) {
+        logger.error("Error fetching user data: {}", e.getMessage());
+        return Mono.just(new Response<>());
     }
 }

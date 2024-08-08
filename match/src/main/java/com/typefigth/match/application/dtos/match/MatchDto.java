@@ -1,22 +1,27 @@
-package com.typefigth.match.domain.models;
+package com.typefigth.match.application.dtos.match;
+
+
+import com.typefigth.match.domain.models.User;
 
 import java.time.LocalDateTime;
 
-public class Match {
+public class MatchDto {
 
     private String id;
     private String ownId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private User own;
 
-    public Match(String id, String ownId, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MatchDto(String id, String ownId, User own, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.ownId = ownId;
+        this.own = own;
     }
 
-    public Match() {
+    public MatchDto() {
     }
 
     public String getId() {
@@ -51,12 +56,21 @@ public class Match {
         this.ownId = ownId;
     }
 
+    public User getOwn() {
+        return own;
+    }
+
+    public void setOwn(User own) {
+        this.own = own;
+    }
+
     // builder
     public static class MatchBuilder {
         private String id;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
         private String ownId;
+        private User own;
 
         public MatchBuilder setId(String id) {
             this.id = id;
@@ -78,8 +92,15 @@ public class Match {
             return this;
         }
 
-        public Match build() {
-            return new Match(id, ownId, createdAt, updatedAt);
+
+        public MatchBuilder setOwn(User own) {
+            this.own = own;
+            return this;
+        }
+
+        public MatchDto build() {
+            return new MatchDto(id, ownId, own, createdAt, updatedAt);
         }
     }
+
 }
