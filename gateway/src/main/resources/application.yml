@@ -2,25 +2,44 @@ server:
   port: 9191
 
 spring:
+  application:
+    name: API-GATEWAY
+
   cloud:
     gateway:
       routes:
-        - id: USER-SERVICE
-          uri: lb://USER-SERVICE
-          predicates:
-            - Path=/api/v1/user/**
-
         - id: MATCH-SERVICE
           uri: lb://MATCH-SERVICE
           predicates:
             - Path=/api/v1/match/**
+          filters:
+            - SetPath=/match
+        - id: USER-SERVICE
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/v1/user/**
+          filters:
+            - SetPath=/user
+        - id: DISCOVERY-SERVICE
+          uri: http://localhost:8761
+          predicates:
+            - Path=/discovery/web
+          filters:
+            - SetPath=/
+        - id: DISCOVERY-SERVICE-STATIC
+          uri: http://localhost:8761
+          predicates:
+            - Path=/discovery/**
+          filters:
+            - SetPath=/
 
-  application:
-    name: API-GATEWAY
+logging:
+  level:
+    org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
+    org.springframework.cloud.gateway: TRACE
+    root: INFO
 
 eureka:
   client:
-    registerWithEureka: true
-    fetchRegistry: true
-    serviceUrl:
+    service-url:
       defaultZone: http://localhost:8761/eureka/
