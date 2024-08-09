@@ -1,5 +1,6 @@
 package com.typefigth.match.infrastructure.controller;
 
+import com.typefigth.match.application.dtos.match.CreateMatchDto;
 import com.typefigth.match.application.dtos.match.MatchDto;
 import com.typefigth.match.application.response.Response;
 import com.typefigth.match.application.services.match.MatchService;
@@ -7,11 +8,13 @@ import com.typefigth.match.domain.models.Match;
 import com.typefigth.match.domain.models.User;
 import com.typefigth.match.infrastructure.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -68,8 +71,14 @@ public class MatchController {
     }
 
     @PostMapping
-    public ResponseEntity<Response<MatchDto>> createMatch(@RequestBody Match body, HttpServletRequest request) {
-        Match newMatch = this.matchService.createMatch(body);
+    public ResponseEntity<Response<MatchDto>> createMatch(@Valid @RequestBody CreateMatchDto body, HttpServletRequest request,  BindingResult bindingResult) {
+
+        Match match = new Match();
+//        if (bindingResult.hasErrors()) {
+//            return ResponseEntity.badRequest().body("Error en la validación");
+//        }
+        match.setOwnId(body.getOwnId());
+        Match newMatch = this.matchService.createMatch(match);
 
         MatchDto matchDto = createMatchDtoWithOwn(newMatch, body.getOwnId());
 
