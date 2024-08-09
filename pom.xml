@@ -21,7 +21,7 @@
         <module>user</module>
         <module>discovery-server</module>
         <module>match</module>
-        <module>gateway</module>
+        <module>api-gateway</module>
     </modules>
 
     <properties>

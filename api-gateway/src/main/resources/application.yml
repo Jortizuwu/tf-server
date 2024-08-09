@@ -8,24 +8,27 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: MATCH-SERVICE
-          uri: lb://MATCH-SERVICE
-          predicates:
-            - Path=/api/v1/match/**
-          filters:
-            - SetPath=/match
         - id: USER-SERVICE
           uri: lb://USER-SERVICE
           predicates:
             - Path=/api/v1/user/**
           filters:
             - SetPath=/user
+
+        - id: MATCH-SERVICE
+          uri: lb://MATCH-SERVICE
+          predicates:
+            - Path=/api/v1/match/**
+          filters:
+            - SetPath=/match
+
         - id: DISCOVERY-SERVICE
           uri: http://localhost:8761
           predicates:
             - Path=/discovery/web
           filters:
             - SetPath=/
+
         - id: DISCOVERY-SERVICE-STATIC
           uri: http://localhost:8761
           predicates:
@@ -36,7 +39,8 @@ spring:
 logging:
   level:
     org.springframework.cloud.gateway.route.RouteDefinitionRouteLocator: INFO
-    org.springframework.cloud.gateway: TRACE
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
     root: INFO
 
 eureka:
