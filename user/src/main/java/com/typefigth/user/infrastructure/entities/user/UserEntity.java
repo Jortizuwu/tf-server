@@ -13,9 +13,17 @@ public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String uid;
+
+    @Column(name = "nickname", unique = true, nullable = false)
     private String nickname;
+
+    @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
+
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "created_at")

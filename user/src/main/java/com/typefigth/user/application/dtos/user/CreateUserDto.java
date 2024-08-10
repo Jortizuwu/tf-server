@@ -7,8 +7,7 @@ import jakarta.validation.constraints.Pattern;
 
 public class CreateUserDto {
 
-    private static final String PASSWORD_REG = "/^\\S*(?=\\S{6,})(?=\\S*\\d)(?=\\S*[A-Z])(?=\\S*[a-z])(?=\\S*[!@#$%^&*? ])\\S*$/";
-    private static final String EMAIL_REG = "/^(([^<>()[\\]\\\\.,;:\\s@\"]+(\\.[^<>()[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$/";
+    private static final String PASSWORD_REG = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,20}$";
 
     @NotNull(message = "nickname cannot be null")
     @NotEmpty(message = "nickname cannot be empty")
@@ -20,7 +19,7 @@ public class CreateUserDto {
 
     @NotNull(message = "Email cannot be null")
     @NotEmpty(message = "Email cannot be empty")
-    @Pattern(regexp = EMAIL_REG, message = "Email must be a valid email address")
+    @Email(message = "Email is not valid")
     private String email;
 
     @NotNull(message = "Name cannot be null")
