@@ -7,6 +7,7 @@ import com.typefigth.match.application.usecases.match.ListMatchUseCaseImpl;
 import com.typefigth.match.domain.ports.out.match.MatchRepositoryPort;
 import com.typefigth.match.infrastructure.adapters.mappers.MatchMapper;
 import com.typefigth.match.infrastructure.adapters.mappers.MatchMapperAdapter;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class ApplicationConfig {
 
     @Bean
+    @LoadBalanced
     public WebClient webClient(WebClient.Builder builder) {
         return builder
                 .baseUrl("http://localhost:8080")

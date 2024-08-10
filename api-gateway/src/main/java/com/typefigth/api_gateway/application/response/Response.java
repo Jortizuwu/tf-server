@@ -1,4 +1,4 @@
-package com.typefigth.match.application.response;
+package com.typefigth.api_gateway.application.response;
 
 public class Response<T> {
 

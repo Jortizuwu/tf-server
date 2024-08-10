@@ -1,8 +1,6 @@
 package com.typefigth.match.infrastructure.exceptions;
 
 
-import com.typefigth.match.application.response.Response;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
@@ -18,23 +16,18 @@ import java.util.Map;
 public class RestExceptionHandlerAdvice {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Response<Object>> handleNotFoundException(ResourceNotFoundException e, HttpServletRequest request) {
-        Response<Object> response = Response.build(
-                404,
-                request.getRequestURI(),
-                false,
-                null,
-                false,
-                getClientIp(request),
-                e.getMessage(),
-                HttpStatus.NOT_FOUND.toString());
+    public ResponseEntity<Map<String, String>> handleNotFoundException(ResourceNotFoundException e) {
+        Map<String, String> response = new HashMap<>();
+
+        response.put("error", e.getMessage());
+        response.put("status", HttpStatus.NOT_FOUND.toString());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Response<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((ObjectError error) -> {
             String fieldName = ((org.springframework.validation.FieldError) error).getField();
@@ -42,29 +35,8 @@ public class RestExceptionHandlerAdvice {
             errors.put(fieldName, errorMessage);
         });
 
-        Response<Map<String, String>> response = Response.build(
-                400,
-                request.getRequestURI(),
-                false,
-                errors,
-                false,
-                getClientIp(request),
-                ex.getMessage(),
-                HttpStatus.BAD_REQUEST.toString());
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
-    private String getClientIp(HttpServletRequest request) {
-        String remoteAddr = "";
 
-        if (request != null) {
-            remoteAddr = request.getHeader("X-FORWARDED-FOR");
-            if (remoteAddr == null || remoteAddr.isEmpty()) {
-                remoteAddr = request.getRemoteAddr();
-            }
-        }
-
-        return remoteAddr;
-    }
 }

@@ -11,7 +11,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/match
     username: jortiz
-    password: 123456
+    password: hola123456
     driver: com.mysql.cj.jdbc.Driver
 
   application:
@@ -19,6 +19,7 @@ spring:
 
 eureka:
   instance:
+    hostname: localhost
     client:
       registerWithEureka: true
       fetchRegistry: true

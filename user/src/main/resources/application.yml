@@ -19,7 +19,9 @@ spring:
     name: USER-SERVICE
 
 eureka:
+
   instance:
+    hostname: localhost
     client:
       registerWithEureka: true
       fetchRegistry: true
