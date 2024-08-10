@@ -1,24 +1,22 @@
 package com.typefigth.api_gateway.application.response;
 
-public class Response<T> {
+public class Response {
 
     private int code;
     private String path;
     private boolean success;
-    private T data;
+    private Object data;
     private boolean isArray;
     private String ip;
-    private String message;
     private String status;
 
-    public Response(int code, String path, boolean success, T data, boolean isArray, String ip, String message, String status) {
+    public Response(int code, String path, boolean success, Object data, boolean isArray, String ip, String status) {
         this.code = code;
         this.path = path;
         this.success = success;
         this.data = data;
         this.isArray = isArray;
         this.ip = ip;
-        this.message = message;
         this.status = status;
     }
 
@@ -49,27 +47,20 @@ public class Response<T> {
         this.success = success;
     }
 
-    public T getData() {
+    public Object getData() {
         return data;
     }
 
-    public void setData(T data) {
+    public void setData(Object data) {
         this.data = data;
     }
 
-    public String getMessage() {
-        return message;
-    }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public boolean isArray() {
+    public boolean getIsArray() {
         return isArray;
     }
 
-    public void setArray(boolean array) {
+    public void setIsArray(boolean array) {
         isArray = array;
     }
 
@@ -89,8 +80,8 @@ public class Response<T> {
         this.status = status;
     }
 
-    public static <T> Response<T> build(int code, String path, boolean success, T data, boolean isArray, String ip, String message, String status) {
-        return new Response<>(code, path, success, data, isArray, ip, message, status);
+    public static Response build(int code, String path, boolean success, Object data, boolean isArray, String ip,  String status) {
+        return new Response(code, path, success, data, isArray, ip, status);
     }
 
     @Override
@@ -102,7 +93,6 @@ public class Response<T> {
                 ", data=" + data +
                 ", isArray=" + isArray +
                 ", ip='" + ip + '\'' +
-                ", message='" + message + '\'' +
                 ", status='" + status + '\'' +
                 '}';
     }
