@@ -185,7 +185,5 @@ and then you can connect to it remotely using your IDE. For example, from Intell
 
 # Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Jortizuwu/tf-server&type=Date)](https://star-history.com/#khoubyari/spring-boot-rest-example&Date)
-
-# Questions and Comments: khoubyari@gmail.com
+[![Star History Chart](https://api.star-history.com/svg?repos=Jortizuwu/tf-server&type=Date)](https://star-history.com/#Jortizuwu/tf-server&type&Date)
 
