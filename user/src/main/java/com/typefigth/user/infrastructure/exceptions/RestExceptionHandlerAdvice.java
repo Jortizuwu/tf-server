@@ -34,10 +34,17 @@ public class RestExceptionHandlerAdvice {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Map<String, String>> dataIntegrityViolationException(DataIntegrityViolationException e) {
-        Map<String, String> response = new HashMap<>();
-        response.put(Constants.ERROR, e.getMessage());
-        response.put(Constants.STATUS, HttpStatus.CONFLICT.toString());
+    public ResponseEntity<Map<String, Object>> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        Map<String, Object> response = new HashMap<>();
+
+        String errorMessage = e.getRootCause() != null ? e.getRootCause().getMessage() : e.getMessage();
+
+        String[] duplicateFields = extractDuplicateFields(errorMessage);
+
+        response.put("error", "Data integrity violation");
+        response.put("status", HttpStatus.CONFLICT.toString());
+        response.put("duplicateFields", duplicateFields);
+
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
@@ -58,5 +65,15 @@ public class RestExceptionHandlerAdvice {
             errors.put(fieldName, errorMessage);
         });
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    }
+
+    private String[] extractDuplicateFields(String errorMessage) {
+        if (errorMessage.contains("nickname")) {
+            return new String[]{"nickname"};
+        } else if (errorMessage.contains("email")) {
+            return new String[]{"email"};
+        } else {
+            return new String[]{};
+        }
     }
 }
