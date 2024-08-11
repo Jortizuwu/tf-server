@@ -1,5 +1,6 @@
 package com.typefigth.user.infrastructure.entities.user;
 
+import com.typefigth.user.domain.models.user.enun.Status;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -29,6 +30,9 @@ public class UserEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "status", nullable = false)
+    private Status status;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -37,6 +41,7 @@ public class UserEntity {
 
     @PrePersist
     private void prePersist() {
+        this.status = Status.ACTIVE;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -46,12 +51,13 @@ public class UserEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public UserEntity(String uid, String nickname, String password, String email, String name, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public UserEntity(String uid, String nickname, String password, String email, String name, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.uid = uid;
         this.nickname = nickname;
         this.password = password;
         this.email = email;
         this.name = name;
+        this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -79,6 +85,10 @@ public class UserEntity {
         return name;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -99,13 +109,16 @@ public class UserEntity {
         this.password = password;
     }
 
-
     public void setEmail(String email) {
         this.email = email;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
@@ -118,12 +131,12 @@ public class UserEntity {
 
     // build
     public static class UserEntityBuilder {
-
         private String uid;
         private String nickname;
         private String password;
         private String email;
         private String name;
+        private Status status;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -152,6 +165,11 @@ public class UserEntity {
             return this;
         }
 
+        public UserEntityBuilder setStatus(Status status) {
+            this.status = status;
+            return this;
+        }
+
         public UserEntityBuilder setCreatedAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
@@ -163,7 +181,7 @@ public class UserEntity {
         }
 
         public UserEntity build() {
-            return new UserEntity(uid, nickname, password, email, name, createdAt, updatedAt);
+            return new UserEntity(uid, nickname, password, email, name, status, createdAt, updatedAt);
         }
     }
 }

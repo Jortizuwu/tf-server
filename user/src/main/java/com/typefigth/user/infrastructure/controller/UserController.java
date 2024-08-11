@@ -2,8 +2,11 @@ package com.typefigth.user.infrastructure.controller;
 
 import com.typefigth.user.application.dtos.user.CreateUserDto;
 import com.typefigth.user.application.dtos.user.UpdateUserDto;
+import com.typefigth.user.application.dtos.user.UserDto;
 import com.typefigth.user.application.services.user.UserService;
 import com.typefigth.user.domain.models.user.User;
+import com.typefigth.user.domain.models.user.enun.Status;
+import com.typefigth.user.infrastructure.adapters.user.mapper.UserMapper;
 import com.typefigth.user.infrastructure.exceptions.DuplicatedValueException;
 import com.typefigth.user.infrastructure.exceptions.ResourceNotFoundException;
 import com.typefigth.user.infrastructure.repository.JpaUserRepository;
@@ -21,31 +24,39 @@ public class UserController {
 
     private final UserService userServices;
     private final JpaUserRepository jpaUserRepository;
+    private final UserMapper userMapper;
 
-    private final String USER_NOT_FOUND = "User with id %s not found";
+    private static final String USER_NOT_FOUND = "User with id %s not found";
 
-    public UserController(UserService userServices, JpaUserRepository jpaUserRepository) {
+    public UserController(UserService userServices, JpaUserRepository jpaUserRepository, UserMapper userMapper) {
         this.userServices = userServices;
         this.jpaUserRepository = jpaUserRepository;
+        this.userMapper = userMapper;
     }
 
     @Transactional(readOnly = true)
     @GetMapping()
-    public ResponseEntity<List<User>> listUsers() {
+    public ResponseEntity<List<UserDto>> listUsers() {
         List<User> users = this.userServices.listUsers();
-        return ResponseEntity.status(HttpStatus.OK).body(users);
+
+        List<UserDto> usersDto = users.stream().map(userMapper::fromUser).toList();
+
+        return ResponseEntity.status(HttpStatus.OK).body(usersDto);
     }
 
     @Transactional(readOnly = true)
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable String id) {
+    public ResponseEntity<UserDto> getUser(@PathVariable String id) {
         User user = this.userServices.getUser(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+
+        UserDto userDto = userMapper.fromUser(user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(userDto);
     }
 
     @Transactional()
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody CreateUserDto body) {
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserDto body) {
 
         User user = new User();
         user.setNickname(body.getNickname());
@@ -53,15 +64,19 @@ public class UserController {
         user.setEmail(body.getEmail());
         user.setName(body.getName());
 
-        return ResponseEntity.status(HttpStatus.OK).body(this.userServices.createUser(user));
+        return ResponseEntity.status(HttpStatus.OK).body(userMapper.fromUser(this.userServices.createUser(user)));
     }
 
     @Transactional()
     @PatchMapping("/{id}")
-    public ResponseEntity<User> updateUser(@Valid @RequestBody UpdateUserDto body, @PathVariable String id) {
+    public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UpdateUserDto body, @PathVariable String id) {
 
         User userDb = this.userServices.getUser(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
+
+        if (userDb.getStatus().equals(Status.INACTIVE)) {
+            throw new ResourceNotFoundException(String.format("error user with id: %s is inactive", id));
+        }
 
         if (body.getNickname() != null &&
                 !body.getNickname().equals(userDb.getNickname()) &&
@@ -79,10 +94,26 @@ public class UserController {
         if (body.getEmail() != null) userDb.setEmail(body.getEmail());
         if (body.getName() != null) userDb.setName(body.getName());
         if (body.getPassword() != null) userDb.setPassword(body.getPassword());
+        if (body.getStatus() != null) userDb.setStatus(body.getStatus());
 
         User userUpdated = this.userServices.updateUser(id, userDb)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
 
-        return ResponseEntity.ok(userUpdated);
+        return ResponseEntity.ok(this.userMapper.fromUser(userUpdated));
+    }
+
+    @Transactional()
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+        
+        User userDb = this.userServices.getUser(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
+
+        if (userDb.getStatus().equals(Status.INACTIVE)) {
+            throw new ResourceNotFoundException(String.format("error user with id: %s is inactive", id));
+        }
+
+        this.userServices.deleteUser(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

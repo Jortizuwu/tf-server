@@ -27,7 +27,6 @@ public class CreateUserDto {
     private String name;
 
     // Getters y Setters
-
     public String getNickname() {
         return nickname;
     }

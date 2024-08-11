@@ -1,5 +1,7 @@
 package com.typefigth.user.domain.models.user;
 
+import com.typefigth.user.domain.models.user.enun.Status;
+
 import java.time.LocalDateTime;
 
 public class User {
@@ -9,15 +11,17 @@ public class User {
     private String password;
     private String email;
     private String name;
+    private Status status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public User(String uid, String nickname, String password, String email, String name, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(String uid, String nickname, String password, String email, String name, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.uid = uid;
         this.nickname = nickname;
         this.password = password;
         this.email = email;
         this.name = name;
+        this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -53,6 +57,10 @@ public class User {
         return createdAt;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
     public void setUid(String uid) {
         this.uid = uid;
     }
@@ -73,6 +81,10 @@ public class User {
         this.name = name;
     }
 
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
@@ -80,16 +92,18 @@ public class User {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
+    
     // builder
     public static class UserBuilder {
         private String uid;
         private String nickname;
         private String password;
         private String email;
+        private Status status;
         private String name;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
+
 
         public UserBuilder setUid(String uid) {
             this.uid = uid;
@@ -116,6 +130,11 @@ public class User {
             return this;
         }
 
+        public UserBuilder setStatus(Status status) {
+            this.status = status;
+            return this;
+        }
+
         public UserBuilder setCreatedAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
@@ -127,7 +146,7 @@ public class User {
         }
 
         public User build() {
-            return new User(uid, nickname, password, email, name, createdAt, updatedAt);
+            return new User(uid, nickname, password, email, name, status, createdAt, updatedAt);
         }
     }
 

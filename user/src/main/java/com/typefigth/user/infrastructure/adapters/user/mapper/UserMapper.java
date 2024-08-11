@@ -1,5 +1,6 @@
 package com.typefigth.user.infrastructure.adapters.user.mapper;
 
+import com.typefigth.user.application.dtos.user.UserDto;
 import com.typefigth.user.domain.models.user.User;
 import com.typefigth.user.infrastructure.entities.user.UserEntity;
 
@@ -9,4 +10,5 @@ public interface UserMapper {
 
     User fromEntity(UserEntity entity);
 
+    UserDto fromUser(User user);
 }

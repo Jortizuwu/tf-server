@@ -1,6 +1,7 @@
 package com.typefigth.user.infrastructure.adapters.user;
 
 import com.typefigth.user.domain.models.user.User;
+import com.typefigth.user.domain.models.user.enun.Status;
 import com.typefigth.user.domain.ports.out.user.UserRepositoryPort;
 import com.typefigth.user.infrastructure.adapters.user.mapper.UserMapper;
 import com.typefigth.user.infrastructure.entities.user.UserEntity;
@@ -41,8 +42,10 @@ public class JpaUserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public boolean deleteById(String id) {
-        if (this.jpaUserRepository.existsById(id)) {
-            this.jpaUserRepository.deleteById(id);
+        Optional<UserEntity> user = this.jpaUserRepository.findById(id);
+        if (user.isPresent()) {
+            user.get().setStatus(Status.INACTIVE);
+            this.jpaUserRepository.save(user.get());
             return true;
         }
         return false;

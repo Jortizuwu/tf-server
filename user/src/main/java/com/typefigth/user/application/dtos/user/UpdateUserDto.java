@@ -1,5 +1,6 @@
 package com.typefigth.user.application.dtos.user;
 
+import com.typefigth.user.domain.models.user.enun.Status;
 import com.typefigth.user.infrastructure.utils.Constants;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -18,6 +19,8 @@ public class UpdateUserDto {
     private String email;
 
     private String name;
+
+    private Status status;
 
     public String getNickname() {
         return nickname;
@@ -50,4 +53,13 @@ public class UpdateUserDto {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Status getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
 }
