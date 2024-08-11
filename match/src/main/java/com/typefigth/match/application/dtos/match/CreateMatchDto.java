@@ -12,11 +12,11 @@ public class CreateMatchDto {
     private String ownId;
 
 
-    public @NotBlank(message = "ownId must not be blank") @NotNull(message = "ownId must not be null") String getOwnId() {
+    public String getOwnId() {
         return ownId;
     }
 
-    public void setOwnId(@NotBlank(message = "ownId must not be blank") @NotNull(message = "ownId must not be null") String ownId) {
+    public void setOwnId(String ownId) {
         this.ownId = ownId;
     }
 }

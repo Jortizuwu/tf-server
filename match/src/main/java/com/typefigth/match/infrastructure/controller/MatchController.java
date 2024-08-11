@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -34,22 +34,24 @@ public class MatchController {
         this.webClient = webClient;
     }
 
+    @Transactional(readOnly = true)
     @GetMapping()
-    public ResponseEntity<List<MatchDto>> listMatches(HttpServletRequest request) {
+    public ResponseEntity<List<MatchDto>> listMatches() {
         List<MatchDto> matches = this.matchService.listMatch().stream().map(value -> this.createMatchDtoWithOwn(value, value.getOwnId())).toList();
         return ResponseEntity.status(HttpStatus.OK).body(matches);
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/{id}")
-    public ResponseEntity<MatchDto> getMatch(@PathVariable String id, HttpServletRequest request) {
+    public ResponseEntity<MatchDto> getMatch(@PathVariable String id) {
         Match match = this.matchService.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("error match with id: %s not found", id)));
         MatchDto matchDto = createMatchDtoWithOwn(match, match.getOwnId());
         return ResponseEntity.status(HttpStatus.OK).body(matchDto);
     }
 
+    @Transactional()
     @PostMapping
-    public ResponseEntity<MatchDto> createMatch(@Valid @RequestBody CreateMatchDto body, HttpServletRequest request, BindingResult bindingResult) {
-
+    public ResponseEntity<MatchDto> createMatch(@Valid @RequestBody CreateMatchDto body) {
 
         Match match = new Match();
         match.setOwnId(body.getOwnId());
@@ -62,11 +64,8 @@ public class MatchController {
 
 
     private MatchDto createMatchDtoWithOwn(Match match, String id) {
-
         MatchDto matchDto = new MatchDto(match.getId(), match.getOwnId(), null, match.getCreatedAt(), match.getUpdatedAt());
-
         User userResponse = findUserById(id);
-
         if (userResponse != null) {
             matchDto.setOwn(userResponse);
         }
@@ -81,7 +80,6 @@ public class MatchController {
                 .onErrorResume(this::apply)
                 .block();
     }
-
 
     private Mono<? extends User> apply(Throwable e) {
         logger.error("Error fetching user data: {}", e.getMessage());
