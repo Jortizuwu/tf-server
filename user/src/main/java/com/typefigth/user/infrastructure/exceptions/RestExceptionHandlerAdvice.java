@@ -1,5 +1,7 @@
 package com.typefigth.user.infrastructure.exceptions;
 
+import com.typefigth.user.infrastructure.utils.Constants;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -14,19 +16,36 @@ import java.util.Map;
 @RestControllerAdvice
 public class RestExceptionHandlerAdvice {
 
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFoundException(ResourceNotFoundException e) {
         Map<String, String> response = new HashMap<>();
-        response.put("error", e.getMessage());
-        response.put("status", HttpStatus.NOT_FOUND.toString());
+        response.put(Constants.ERROR, e.getMessage());
+        response.put(Constants.STATUS, HttpStatus.NOT_FOUND.toString());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, String>> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    @ExceptionHandler(DuplicatedValueException.class)
+    public ResponseEntity<Map<String, String>> duplicatedValueException(DuplicatedValueException e) {
         Map<String, String> response = new HashMap<>();
-        response.put("error", e.getMessage());
-        response.put("status", HttpStatus.BAD_REQUEST.toString());
+        response.put(Constants.ERROR, e.getMessage());
+        response.put(Constants.STATUS, HttpStatus.CONFLICT.toString());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> dataIntegrityViolationException(DataIntegrityViolationException e) {
+        Map<String, String> response = new HashMap<>();
+        response.put(Constants.ERROR, e.getMessage());
+        response.put(Constants.STATUS, HttpStatus.CONFLICT.toString());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleHttpMessageNotReadableException() {
+        Map<String, String> response = new HashMap<>();
+        response.put(Constants.ERROR, "malformed json");
+        response.put(Constants.STATUS, HttpStatus.BAD_REQUEST.toString());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
@@ -38,7 +57,6 @@ public class RestExceptionHandlerAdvice {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 }

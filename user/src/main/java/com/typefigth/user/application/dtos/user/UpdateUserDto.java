@@ -7,26 +7,17 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 
-public class CreateUserDto {
+public class UpdateUserDto {
 
-    @NotNull(message = "nickname cannot be null")
-    @NotEmpty(message = "nickname cannot be empty")
     private String nickname;
 
-    @NotNull(message = "Password cannot be null")
     @Pattern(regexp = Constants.PASSWORD_REGEX, message = "Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one digit, and one special character")
     private String password;
 
     @Email(message = "Email is not valid")
-    @NotNull(message = "Email cannot be null")
-    @NotEmpty(message = "Email cannot be empty")
     private String email;
 
-    @NotNull(message = "Name cannot be null")
-    @NotEmpty(message = "Name cannot be empty")
     private String name;
-
-    // Getters y Setters
 
     public String getNickname() {
         return nickname;

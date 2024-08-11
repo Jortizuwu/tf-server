@@ -1,13 +1,16 @@
 package com.typefigth.user.infrastructure.entities.user;
 
-
-import com.typefigth.user.domain.models.user.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+                "email",
+                "nickname"
+        })
+})
 public class UserEntity {
 
     @Id
@@ -95,6 +98,7 @@ public class UserEntity {
     public void setPassword(String password) {
         this.password = password;
     }
+
 
     public void setEmail(String email) {
         this.email = email;

@@ -29,4 +29,5 @@ public class UserMapperAdapter implements UserMapper {
                 .setUpdatedAt(entity.getUpdatedAt())
                 .build();
     }
+
 }
