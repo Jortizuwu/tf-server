@@ -5,8 +5,8 @@ import com.typefigth.match.application.dtos.match.MatchDto;
 import com.typefigth.match.application.services.match.MatchService;
 import com.typefigth.match.domain.models.Match;
 import com.typefigth.match.domain.models.User;
+import com.typefigth.match.infrastructure.adapters.mappers.MatchMapper;
 import com.typefigth.match.infrastructure.exceptions.ResourceNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -29,15 +30,18 @@ public class MatchController {
 
     private final WebClient webClient;
 
-    public MatchController(MatchService matchService, WebClient webClient) {
+    private final MatchMapper matchMapper;
+
+    public MatchController(MatchService matchService, WebClient webClient, MatchMapper matchMapper) {
         this.matchService = matchService;
         this.webClient = webClient;
+        this.matchMapper = matchMapper;
     }
 
     @Transactional(readOnly = true)
     @GetMapping()
     public ResponseEntity<List<MatchDto>> listMatches() {
-        List<MatchDto> matches = this.matchService.listMatch().stream().map(value -> this.createMatchDtoWithOwn(value, value.getOwnId())).toList();
+        List<MatchDto> matches = this.matchService.listMatch().stream().map(this::createMatchDtoWithUsersList).toList();
         return ResponseEntity.status(HttpStatus.OK).body(matches);
     }
 
@@ -45,40 +49,36 @@ public class MatchController {
     @GetMapping("/{id}")
     public ResponseEntity<MatchDto> getMatch(@PathVariable String id) {
         Match match = this.matchService.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("error match with id: %s not found", id)));
-        MatchDto matchDto = createMatchDtoWithOwn(match, match.getOwnId());
+        MatchDto matchDto = this.createMatchDtoWithUsersList(match);
         return ResponseEntity.status(HttpStatus.OK).body(matchDto);
     }
 
     @Transactional()
     @PostMapping
     public ResponseEntity<MatchDto> createMatch(@Valid @RequestBody CreateMatchDto body) {
-
         Match match = new Match();
         match.setOwnId(body.getOwnId());
-
         Match newMatch = this.matchService.createMatch(match);
-
-        MatchDto matchDto = createMatchDtoWithOwn(newMatch, body.getOwnId());
+        MatchDto matchDto = this.createMatchDtoWithUsersList(newMatch);
         return ResponseEntity.status(HttpStatus.OK).body(matchDto);
     }
 
-
-    private MatchDto createMatchDtoWithOwn(Match match, String id) {
-        MatchDto matchDto = new MatchDto(match.getId(), match.getOwnId(), null, match.getCreatedAt(), match.getUpdatedAt());
-        User userResponse = findUserById(id);
-        if (userResponse != null) {
-            matchDto.setOwn(userResponse);
+    private MatchDto createMatchDtoWithUsersList(Match match) {
+        List<String> usersId = List.of(match.getOwnId(), match.getOpponentId() != null ? match.getOpponentId() : "");
+        List<User> users = new ArrayList<>();
+        for (String id : usersId) {
+            if (!id.isEmpty()) {
+                User user = findUserById(id);
+                if (user != null) {
+                    users.add(user);
+                }
+            }
         }
-        return matchDto;
+        return matchMapper.toDto(match, users);
     }
 
     private User findUserById(String id) {
-        return webClient.get()
-                .uri("http://localhost:8080/user/" + id)
-                .retrieve()
-                .bodyToMono(User.class)
-                .onErrorResume(this::apply)
-                .block();
+        return webClient.get().uri("http://localhost:8080/user/" + id).retrieve().bodyToMono(User.class).onErrorResume(this::apply).block();
     }
 
     private Mono<? extends User> apply(Throwable e) {

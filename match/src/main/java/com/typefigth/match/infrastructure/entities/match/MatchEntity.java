@@ -1,5 +1,6 @@
 package com.typefigth.match.infrastructure.entities.match;
 
+import com.typefigth.match.domain.models.enun.Status;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -8,24 +9,29 @@ import java.time.LocalDateTime;
 @Table(name = "matches")
 public class MatchEntity {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "own_id")
+    @Column(name = "own_id", nullable = false)
     private String ownId;
+
+    @Column(name = "opponent_id")
+    private String opponentId;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-//    @Transient
-//    private User user;
-
     @PrePersist
     private void prePersist() {
+        this.status = Status.CREATED;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -35,11 +41,13 @@ public class MatchEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public MatchEntity(String id, String ownId, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MatchEntity(String id, String ownId, String opponentId, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.ownId = ownId;
+        this.status = status;
+        this.opponentId = opponentId;
     }
 
     public MatchEntity() {
@@ -59,6 +67,23 @@ public class MatchEntity {
 
     public void setOwnId(String ownId) {
         this.ownId = ownId;
+    }
+
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public String getOpponentId() {
+        return opponentId;
+    }
+
+    public void setOpponentId(String opponentId) {
+        this.opponentId = opponentId;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -83,6 +108,8 @@ public class MatchEntity {
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
         private String ownId;
+        private String opponentId;
+        private Status status;
 
         public MatchBuilder setId(String id) {
             this.id = id;
@@ -91,6 +118,16 @@ public class MatchEntity {
 
         public MatchBuilder setOwnId(String ownId) {
             this.ownId = ownId;
+            return this;
+        }
+
+        public MatchBuilder setOpponentId(String opponentId) {
+            this.opponentId = opponentId;
+            return this;
+        }
+
+        public MatchBuilder setStatus(Status status) {
+            this.status = status;
             return this;
         }
 
@@ -105,7 +142,7 @@ public class MatchEntity {
         }
 
         public MatchEntity build() {
-            return new MatchEntity(id, ownId, createdAt, updatedAt);
+            return new MatchEntity(id, ownId, opponentId, status, createdAt, updatedAt);
         }
     }
 }

@@ -31,6 +31,7 @@ public class UserEntity {
     private String name;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @Column(name = "created_at")

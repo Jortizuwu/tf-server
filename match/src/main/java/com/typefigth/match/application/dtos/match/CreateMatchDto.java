@@ -10,8 +10,7 @@ public class CreateMatchDto {
     @NotNull(message = "ownId must not be null")
     @NotEmpty(message = "ownId must not be empty")
     private String ownId;
-
-
+    
     public String getOwnId() {
         return ownId;
     }
