@@ -11,22 +11,23 @@ public class MatchEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, length = 36)
     private String id;
 
-    @Column(name = "own_id", nullable = false)
+    @Column(name = "own_id", nullable = false, length = 36)
     private String ownId;
 
-    @Column(name = "opponent_id")
+    @Column(name = "opponent_id", length = 36)
     private String opponentId;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
@@ -68,7 +69,6 @@ public class MatchEntity {
     public void setOwnId(String ownId) {
         this.ownId = ownId;
     }
-
 
     public Status getStatus() {
         return status;
