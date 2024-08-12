@@ -15,6 +15,8 @@ public class MatchMapperAdapter implements MatchMapper {
                 .setCreatedAt(match.getCreatedAt())
                 .setUpdatedAt(match.getUpdatedAt())
                 .setOwnId(match.getOwnId())
+                .setOpponentId(match.getOpponentId())
+                .setStatus(match.getStatus())
                 .build();
 
     }
@@ -25,6 +27,8 @@ public class MatchMapperAdapter implements MatchMapper {
                 .setCreatedAt(entity.getCreatedAt())
                 .setUpdatedAt(entity.getUpdatedAt())
                 .setOwnId(entity.getOwnId())
+                .setOpponentId(entity.getOpponentId())
+                .setStatus(entity.getStatus())
                 .build();
     }
 

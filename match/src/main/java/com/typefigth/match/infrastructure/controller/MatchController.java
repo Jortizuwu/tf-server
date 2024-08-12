@@ -60,8 +60,16 @@ public class MatchController {
     @Transactional()
     @PostMapping
     public ResponseEntity<MatchDto> createMatch(@Valid @RequestBody CreateMatchDto body) {
+
+        User user = this.findUserById(body.getOwnId());
+
+        if (user.getUid() == null) {
+            throw new ResourceNotFoundException(String.format("error user with id: %s not found", body.getOwnId()));
+        }
+
         Match match = new Match();
         match.setOwnId(body.getOwnId());
+
         Match newMatch = this.matchService.createMatch(match);
         MatchDto matchDto = this.createMatchDtoWithUsersList(newMatch);
         return ResponseEntity.status(HttpStatus.OK).body(matchDto);
@@ -122,7 +130,7 @@ public class MatchController {
 
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
-    
+
     private MatchDto createMatchDtoWithUsersList(Match match) {
         List<String> usersId = List.of(match.getOwnId(), match.getOpponentId() != null ? match.getOpponentId() : "");
         List<User> users = new ArrayList<>();
@@ -137,7 +145,7 @@ public class MatchController {
         return matchMapper.toDto(match, users);
     }
 
-    private Match findMatch(String id) {
+    private Match findMatch(String id) throws ResourceNotFoundException {
         return this.matchService.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("error match with id: %s not found", id)));
     }
 
