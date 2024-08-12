@@ -31,11 +31,6 @@ public class ApplicationConfig {
                 new ListMatchUseCaseImpl(matchRepositoryPort));
     }
 
-//    @Bean
-//    public MatchRepositoryPort matchRepository(JpaMatchRepositoryAdapter jpaMatchRepositoryAdapter) {
-//        return jpaMatchRepositoryAdapter;
-//    }
-
     @Bean
     public MatchMapper matchMapper() {
         return new MatchMapperAdapter();
