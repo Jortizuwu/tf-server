@@ -11,4 +11,10 @@ public interface MatchRepositoryPort {
     List<Match> listMatch();
 
     Match createMatch(Match match);
+
+    Match assignOpponentToMatch(Match match, String opponentId);
+
+    Match cancelMatch(Match match);
+
+    Match finishMatch(Match match);
 }

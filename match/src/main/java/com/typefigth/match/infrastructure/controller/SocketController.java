@@ -14,7 +14,7 @@ public class SocketController {
 
     @MessageMapping("/room/{roomId}")
     @SendTo("/room/{roomId}")
-    public String matchRoom(@DestinationVariable String roomId, String message) {
+    public String startMatchRoom(@DestinationVariable String roomId, String message) {
         this.logger.info("{}", message + roomId);
         return message;
     }

@@ -1,6 +1,7 @@
 package com.typefigth.match.application.services.match;
 
 import com.typefigth.match.domain.models.Match;
+import com.typefigth.match.domain.ports.in.match.AssignOpponentToMatchUseCase;
 import com.typefigth.match.domain.ports.in.match.CreateMatchUseCase;
 import com.typefigth.match.domain.ports.in.match.GetMatchUseCase;
 import com.typefigth.match.domain.ports.in.match.ListMatchUseCase;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class MatchService implements CreateMatchUseCase, GetMatchUseCase, ListMatchUseCase {
+public class MatchService implements CreateMatchUseCase, GetMatchUseCase, ListMatchUseCase, AssignOpponentToMatchUseCase {
 
     private final CreateMatchUseCase createMatchUseCase;
 
@@ -18,10 +19,13 @@ public class MatchService implements CreateMatchUseCase, GetMatchUseCase, ListMa
 
     private final ListMatchUseCase listMatchUseCase;
 
-    public MatchService(CreateMatchUseCase createMatchUseCase, GetMatchUseCase getMatchUseCase, ListMatchUseCase listMatchUseCase) {
+    private final AssignOpponentToMatchUseCase assignOpponentToMatchUseCase;
+
+    public MatchService(CreateMatchUseCase createMatchUseCase, GetMatchUseCase getMatchUseCase, ListMatchUseCase listMatchUseCase, AssignOpponentToMatchUseCase assignOpponentToMatchUseCase) {
         this.createMatchUseCase = createMatchUseCase;
         this.getMatchUseCase = getMatchUseCase;
         this.listMatchUseCase = listMatchUseCase;
+        this.assignOpponentToMatchUseCase = assignOpponentToMatchUseCase;
     }
 
     @Override
@@ -37,6 +41,11 @@ public class MatchService implements CreateMatchUseCase, GetMatchUseCase, ListMa
     @Override
     public List<Match> listMatch() {
         return this.listMatchUseCase.listMatch();
+    }
+
+    @Override
+    public Match assignOpponentToMatch(Match match, String opponentId) {
+       return this.assignOpponentToMatchUseCase.assignOpponentToMatch(match, opponentId);
     }
 }
 

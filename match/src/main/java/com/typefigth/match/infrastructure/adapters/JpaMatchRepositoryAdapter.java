@@ -2,6 +2,7 @@ package com.typefigth.match.infrastructure.adapters;
 
 
 import com.typefigth.match.domain.models.Match;
+import com.typefigth.match.domain.models.enun.Status;
 import com.typefigth.match.domain.ports.out.match.MatchRepositoryPort;
 import com.typefigth.match.infrastructure.adapters.mappers.MatchMapper;
 import com.typefigth.match.infrastructure.entities.match.MatchEntity;
@@ -27,8 +28,8 @@ public class JpaMatchRepositoryAdapter implements MatchRepositoryPort {
     public Optional<Match> findById(String id) {
         Optional<MatchEntity> optionalMatchEntity = this.jpaMatchRepository.findById(id);
 
-        if(optionalMatchEntity.isEmpty()) {
-            return  Optional.empty();
+        if (optionalMatchEntity.isEmpty()) {
+            return Optional.empty();
         }
 
         Match match = this.matchMapper.fromEntity(optionalMatchEntity.get());
@@ -43,5 +44,24 @@ public class JpaMatchRepositoryAdapter implements MatchRepositoryPort {
     @Override
     public Match createMatch(Match match) {
         return this.matchMapper.fromEntity(this.jpaMatchRepository.save(matchMapper.toEntity(match)));
+    }
+
+    @Override
+    public Match assignOpponentToMatch(Match match, String opponentId) {
+        match.setOpponentId(opponentId);
+        match.setStatus(Status.CURRENT);
+        return this.matchMapper.fromEntity(this.jpaMatchRepository.save(this.matchMapper.toEntity(match)));
+    }
+
+    @Override
+    public Match cancelMatch(Match match) {
+        match.setStatus(Status.CANCELED);
+        return this.matchMapper.fromEntity(this.jpaMatchRepository.save(this.matchMapper.toEntity(match)));
+    }
+
+    @Override
+    public Match finishMatch(Match match) {
+        match.setStatus(Status.FINISHED);
+        return this.matchMapper.fromEntity(this.jpaMatchRepository.save(this.matchMapper.toEntity(match)));
     }
 }

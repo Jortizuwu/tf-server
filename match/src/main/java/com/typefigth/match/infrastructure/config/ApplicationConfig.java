@@ -1,9 +1,7 @@
 package com.typefigth.match.infrastructure.config;
 
 import com.typefigth.match.application.services.match.MatchService;
-import com.typefigth.match.application.usecases.match.CreateMatchUseCaseImpl;
-import com.typefigth.match.application.usecases.match.GetMatchUseCaseImpl;
-import com.typefigth.match.application.usecases.match.ListMatchUseCaseImpl;
+import com.typefigth.match.application.usecases.match.*;
 import com.typefigth.match.domain.ports.out.match.MatchRepositoryPort;
 import com.typefigth.match.infrastructure.adapters.mappers.MatchMapper;
 import com.typefigth.match.infrastructure.adapters.mappers.MatchMapperAdapter;
@@ -28,7 +26,11 @@ public class ApplicationConfig {
         return new MatchService(
                 new CreateMatchUseCaseImpl(matchRepositoryPort),
                 new GetMatchUseCaseImpl(matchRepositoryPort),
-                new ListMatchUseCaseImpl(matchRepositoryPort));
+                new ListMatchUseCaseImpl(matchRepositoryPort),
+                new AssignOpponentToMatchUseCaseImpl(matchRepositoryPort),
+                new CancelMatchUseCaseImpl(matchRepositoryPort),
+                new FinishMatchUseCaseImpl(matchRepositoryPort)
+        );
     }
 
     @Bean
