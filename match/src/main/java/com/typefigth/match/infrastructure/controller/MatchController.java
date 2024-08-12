@@ -52,8 +52,8 @@ public class MatchController {
     @Transactional(readOnly = true)
     @GetMapping("/{id}")
     public ResponseEntity<MatchDto> getMatch(@PathVariable String id) {
-        Match match = this.matchService.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("error match with id: %s not found", id)));
-        MatchDto matchDto = this.createMatchDtoWithUsersList(match);
+        Match matchDb = this.findMatch(id);
+        MatchDto matchDto = this.createMatchDtoWithUsersList(matchDb);
         return ResponseEntity.status(HttpStatus.OK).body(matchDto);
     }
 
@@ -71,7 +71,7 @@ public class MatchController {
     @PostMapping("/assign/opponent/{matchId}")
     public ResponseEntity<Object> assignOpponentToMatch(@Valid @RequestBody AssignMatchDto body, @PathVariable String matchId) {
 
-        Match matchDb = this.matchService.findById(matchId).orElseThrow(() -> new ResourceNotFoundException(String.format("error match with id: %s not found", matchId)));
+        Match matchDb = this.findMatch(matchId);
 
         Map<String, Object> response = new HashMap<>();
 
@@ -103,7 +103,26 @@ public class MatchController {
         return ResponseEntity.status(HttpStatus.OK).body(matchDto);
     }
 
+    @Transactional()
+    @PostMapping("/cancel/{matchId}")
+    public ResponseEntity<Object> cancelMatch(@PathVariable String matchId) {
+        Match match = this.findMatch(matchId);
 
+        this.matchService.cancelMatch(match);
+
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @Transactional()
+    @PostMapping("/finish/{matchId}")
+    public ResponseEntity<Object> finishMatch(@PathVariable String matchId) {
+        Match match = this.findMatch(matchId);
+
+        this.matchService.finishMatch(match);
+
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+    
     private MatchDto createMatchDtoWithUsersList(Match match) {
         List<String> usersId = List.of(match.getOwnId(), match.getOpponentId() != null ? match.getOpponentId() : "");
         List<User> users = new ArrayList<>();
@@ -116,6 +135,10 @@ public class MatchController {
             }
         }
         return matchMapper.toDto(match, users);
+    }
+
+    private Match findMatch(String id) {
+        return this.matchService.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("error match with id: %s not found", id)));
     }
 
     private User findUserById(String id) {
