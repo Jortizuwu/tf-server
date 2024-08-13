@@ -9,6 +9,7 @@ import com.typefigth.match.domain.models.User;
 import com.typefigth.match.domain.models.enun.Status;
 import com.typefigth.match.infrastructure.adapters.mappers.MatchMapper;
 import com.typefigth.match.infrastructure.exceptions.ResourceNotFoundException;
+import com.typefigth.match.infrastructure.utils.Constants;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class MatchController {
 
         User user = this.findUserById(body.getOwnId());
 
-        if (user.getUid() == null) {
+        if (user == null || user.getUid() == null) {
             throw new ResourceNotFoundException(String.format("error user with id: %s not found", body.getOwnId()));
         }
 
@@ -83,16 +84,13 @@ public class MatchController {
 
         Map<String, Object> response = new HashMap<>();
 
-        if (matchDb.getStatus().equals(Status.CANCELED)
-                || matchDb.getStatus().equals(Status.FINISHED)
-                || matchDb.getStatus().equals(Status.CURRENT)
-                || matchDb.getOwnId().equals(body.getOpponentId())
-        ) {
-            String error = matchDb.getStatus().toString();
-            StringBuilder errorMsg = new StringBuilder("Opps!! sorry but can`t assign an opponent to this match, because is ");
+        if (matchDb.getStatus().equals(Status.CANCELED) || matchDb.getStatus().equals(Status.FINISHED) || matchDb.getStatus().equals(Status.CURRENT) || matchDb.getOwnId().equals(body.getOpponentId()) || matchDb.getOpponentId() != null) {
+            String userError = matchDb.getOwnId().equals(body.getOpponentId()) ? "because the own id and opponent id are the same" : "because the opponent is already assigned";
+            String error = matchDb.getStatus() != Status.CREATED ? "because the match status is " + matchDb.getStatus().toString() : userError;
+            StringBuilder errorMsg = new StringBuilder("Opps!! sorry but can`t assign an opponent to this match, ");
 
-            response.put("error", errorMsg.append(error).toString());
-            response.put("status", HttpStatus.BAD_REQUEST.toString());
+            response.put(Constants.ERROR, errorMsg.append(error).toString());
+            response.put(Constants.STATUS, HttpStatus.BAD_REQUEST.toString());
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
@@ -100,8 +98,8 @@ public class MatchController {
         User opponent = this.findUserById(body.getOpponentId());
 
         if (opponent == null) {
-            response.put("error", "Opps!! sorry but can`t assign an opponent to this match, because user not found");
-            response.put("status", HttpStatus.BAD_REQUEST.toString());
+            response.put(Constants.ERROR, "Opps!! sorry but can`t assign an opponent to this match, because user not found");
+            response.put(Constants.STATUS, HttpStatus.BAD_REQUEST.toString());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
@@ -114,7 +112,20 @@ public class MatchController {
     @Transactional()
     @PostMapping("/cancel/{matchId}")
     public ResponseEntity<Object> cancelMatch(@PathVariable String matchId) {
+        Map<String, Object> response = new HashMap<>();
         Match match = this.findMatch(matchId);
+
+        if (match.getStatus().equals(Status.CANCELED)) {
+            response.put(Constants.ERROR, "Opps!! sorry but can`t cancel a canceled match");
+            response.put(Constants.STATUS, HttpStatus.BAD_REQUEST.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+        if (match.getStatus().equals(Status.FINISHED) || match.getStatus().equals(Status.CURRENT)) {
+            response.put(Constants.ERROR, "Opps!! sorry but can`t cancel a finished or current match");
+            response.put(Constants.STATUS, HttpStatus.BAD_REQUEST.toString());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
 
         this.matchService.cancelMatch(match);
 
@@ -124,7 +135,15 @@ public class MatchController {
     @Transactional()
     @PostMapping("/finish/{matchId}")
     public ResponseEntity<Object> finishMatch(@PathVariable String matchId) {
+        Map<String, Object> response = new HashMap<>();
+
         Match match = this.findMatch(matchId);
+
+        if (match.getStatus().equals(Status.FINISHED) || match.getStatus().equals(Status.CANCELED)) {
+            response.put(Constants.ERROR, "Opps!! sorry but can`t finish a canceled or finished match");
+            response.put(Constants.STATUS, HttpStatus.BAD_REQUEST.toString());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
 
         this.matchService.finishMatch(match);
 
