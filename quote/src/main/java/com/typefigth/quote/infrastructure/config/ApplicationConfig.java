@@ -32,9 +32,7 @@ public class ApplicationConfig {
 
     @Bean
     public WebClient webClient(WebClient.Builder builder) {
-        return builder
-                .baseUrl("https://api.quotable.io/quotes")
-                .build();
+        return builder.build();
     }
 
 }

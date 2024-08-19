@@ -12,9 +12,6 @@ public class QuoteEntity {
     @Column(name = "id", nullable = false, length = 36)
     private String id;
 
-    @Column(name = "quote_id", nullable = false, length = 36)
-    private String quoteId;
-
     @Column(name = "match_id", nullable = false, length = 36)
     private String matchId;
 
@@ -28,9 +25,8 @@ public class QuoteEntity {
     private int length;
 
 
-    public QuoteEntity(String id, String quoteId, String matchId, String content, String author, int length) {
+    public QuoteEntity(String id, String matchId, String content, String author, int length) {
         this.id = id;
-        this.quoteId = quoteId;
         this.matchId = matchId;
         this.content = content;
         this.author = author;
@@ -46,14 +42,6 @@ public class QuoteEntity {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getQuoteId() {
-        return quoteId;
-    }
-
-    public void setQuoteId(String quoteId) {
-        this.quoteId = quoteId;
     }
 
     public String getMatchId() {
@@ -93,7 +81,6 @@ public class QuoteEntity {
 
         private String id;
         private String quoteId;
-        private String matchId;
         private String content;
         private String author;
         private int length;
@@ -109,13 +96,6 @@ public class QuoteEntity {
             this.quoteId = quoteId;
             return this;
         }
-
-
-        public QuiteEntityBuilder matchId(String matchId) {
-            this.matchId = matchId;
-            return this;
-        }
-
 
         public QuiteEntityBuilder content(String content) {
             this.content = content;
@@ -136,7 +116,7 @@ public class QuoteEntity {
 
 
         public QuoteEntity build() {
-            return new QuoteEntity(id, quoteId, matchId, content, author, length);
+            return new QuoteEntity(id, quoteId, content, author, length);
         }
     }
 }

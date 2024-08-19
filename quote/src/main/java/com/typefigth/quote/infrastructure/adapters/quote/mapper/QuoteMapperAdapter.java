@@ -10,19 +10,19 @@ public class QuoteMapperAdapter implements QuoteMapper {
 
     @Override
     public QuoteEntity toEntity(Quote quote) {
-        return new QuoteEntity(quote.getId(), quote.getQuoteId(), quote.getMatchId(), quote.getContent(), quote.getAuthor(), quote.getLength());
+        return new QuoteEntity(quote.getId(), quote.getMatchId(), quote.getContent(), quote.getAuthor(), quote.getLength());
     }
 
 
     @Override
     public Quote fromEntity(QuoteEntity entity) {
-        return new Quote(entity.getId(), entity.getQuoteId(), entity.getMatchId(), entity.getContent(), entity.getAuthor(), entity.getLength());
+        return new Quote(entity.getId(), entity.getMatchId(), entity.getContent(), entity.getAuthor(), entity.getLength());
     }
 
 
     @Override
     public QuoteDto fromQuote(Quote quote) {
-        return new QuoteDto(quote.getId(), quote.getQuoteId(), quote.getMatchId(), quote.getContent(), quote.getAuthor(), quote.getLength());
+        return new QuoteDto(quote.getId(), quote.getMatchId(), quote.getContent(), quote.getAuthor(), quote.getLength());
     }
 
 

@@ -1,13 +1,9 @@
 package com.typefigth.quote.application.dtos.quote;
 
-import com.typefigth.quote.domain.models.quote.Quote;
-
-import java.time.LocalDateTime;
 
 public class QuoteDto {
 
     private String id;
-    private String quoteId;
     private String matchId;
     private String content;
     private String author;
@@ -16,9 +12,8 @@ public class QuoteDto {
     public QuoteDto() {
     }
 
-    public QuoteDto(String id, String quoteId, String matchId, String content, String author, int length) {
+    public QuoteDto(String id, String matchId, String content, String author, int length) {
         this.id = id;
-        this.quoteId = quoteId;
         this.matchId = matchId;
         this.content = content;
         this.author = author;
@@ -31,14 +26,6 @@ public class QuoteDto {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getQuoteId() {
-        return quoteId;
-    }
-
-    public void setQuoteId(String quoteId) {
-        this.quoteId = quoteId;
     }
 
     public String getMatchId() {
@@ -76,7 +63,6 @@ public class QuoteDto {
     // builder
     public static class Builder {
         private String id;
-        private String quoteId;
         private String matchId;
         private String content;
         private String author;
@@ -85,11 +71,6 @@ public class QuoteDto {
 
         public Builder id(String id) {
             this.id = id;
-            return this;
-        }
-
-        public Builder quoteId(String quoteId) {
-            this.quoteId = quoteId;
             return this;
         }
 
@@ -114,7 +95,7 @@ public class QuoteDto {
         }
 
         public QuoteDto build() {
-            return new QuoteDto(id, quoteId, matchId, content, author, length);
+            return new QuoteDto(id, matchId, content, author, length);
         }
     }
 }

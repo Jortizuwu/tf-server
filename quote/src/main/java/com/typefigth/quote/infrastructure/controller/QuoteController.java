@@ -1,6 +1,7 @@
 package com.typefigth.quote.infrastructure.controller;
 
 import com.typefigth.quote.application.dtos.quote.CreateQuoteDto;
+import com.typefigth.quote.application.dtos.quote.ExternalQuoteDto;
 import com.typefigth.quote.application.dtos.quote.QuoteDto;
 import com.typefigth.quote.application.services.quote.ExternalService;
 import com.typefigth.quote.application.services.quote.QuoteService;
@@ -14,15 +15,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
 @RequestMapping("/quotes")
 public class QuoteController {
 
-    private Logger logger = LoggerFactory.getLogger(QuoteController.class);
+    private final Logger logger = LoggerFactory.getLogger(QuoteController.class);
 
     private final ExternalService externalService;
     private final QuoteService quoteServices;
@@ -44,7 +45,7 @@ public class QuoteController {
 
         List<QuoteDto> quotesDto = quotes.stream().map(quoteMapper::fromQuote).toList();
 
-        return ResponseEntity.status(HttpStatus.OK).body(Arrays.stream(this.externalService.getRandomQuote().block()).toList().stream().map(quoteMapper::fromQuote).toList());
+        return ResponseEntity.status(HttpStatus.OK).body(quotesDto);
     }
 
     @Transactional(readOnly = true)
@@ -57,15 +58,41 @@ public class QuoteController {
         return ResponseEntity.status(HttpStatus.OK).body(quoteDto);
     }
 
-    @Transactional()
+    @Transactional
     @PostMapping
     public ResponseEntity<QuoteDto> createQuote(@Valid @RequestBody CreateQuoteDto body) {
+        try {
+            externalService.getMatchByID(body.getMatchId()).doOnError(throwable -> {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Match with id " + body.getMatchId() + " not found");
+            }).block();
 
-        Quote quote = new Quote();
+            ExternalQuoteDto[] quotes = externalService.getRandomQuote().doOnError(throwable -> {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "quotes not found");
+            }).block();
 
-        quote.setQuoteId(body.getMatchId());
+            if (quotes == null) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "quotes not found");
+            }
 
-        return ResponseEntity.status(HttpStatus.OK).body(quoteMapper.fromQuote(this.quoteServices.createQuote(quote)));
+            if (quotes.length == 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "quotes not found");
+            }
+            
+            for (ExternalQuoteDto quote : quotes) {
+                Quote newQuote = new Quote();
+                newQuote.setAuthor(quote.getAuthor());
+                newQuote.setContent(quote.getContent());
+                newQuote.setLength(quote.getContent().length());
+                newQuote.setMatchId(body.getMatchId());
+                this.quoteServices.createQuote(newQuote);
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
 

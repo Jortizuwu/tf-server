@@ -4,7 +4,6 @@ package com.typefigth.quote.domain.models.quote;
 public class Quote {
 
     private String id;
-    private String quoteId;
     private String matchId;
     private String content;
     private String author;
@@ -13,9 +12,8 @@ public class Quote {
     public Quote() {
     }
 
-    public Quote(String id, String quoteId, String matchId, String content, String author, int length) {
+    public Quote(String id, String matchId, String content, String author, int length) {
         this.id = id;
-        this.quoteId = quoteId;
         this.matchId = matchId;
         this.content = content;
         this.author = author;
@@ -30,13 +28,6 @@ public class Quote {
         this.id = id;
     }
 
-    public String getQuoteId() {
-        return quoteId;
-    }
-
-    public void setQuoteId(String quoteId) {
-        this.quoteId = quoteId;
-    }
 
     public String getMatchId() {
         return matchId;
@@ -111,7 +102,7 @@ public class Quote {
         }
 
         public Quote build() {
-            return new Quote(id, quoteId, matchId, content, author, length);
+            return new Quote(id, matchId, content, author, length);
         }
     }
 
