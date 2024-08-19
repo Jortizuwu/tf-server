@@ -105,9 +105,13 @@ public class MatchController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        this.externalServices.createQuote(matchId).doOnError(throwable -> {
-            throw new CreateQuoteException(throwable.getMessage());
-        });
+        this.externalServices.createQuote(matchId)
+                .doOnSuccess(success -> this.logger.info("Quote created"))
+                .doOnError(throwable -> {
+                    this.logger.error(throwable.getMessage());
+                    throw new CreateQuoteException(throwable.getMessage());
+                });
+
 
         Match matchWithOpponent = this.matchService.assignOpponentToMatch(matchDb, body.getOpponentId());
         MatchDto matchDto = this.createMatchDtoWithUsersAndQuotesList(matchWithOpponent);

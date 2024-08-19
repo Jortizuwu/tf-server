@@ -4,6 +4,7 @@ import com.typefigth.match.domain.models.Quote;
 import com.typefigth.match.domain.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +19,6 @@ public class ExternalServices {
 
     public ExternalServices(WebClient webClient) {
         this.webClient = webClient;
-
     }
 
     public User findUserById(String id) {
@@ -30,10 +30,18 @@ public class ExternalServices {
     }
 
     public Mono<Void> createQuote(String id) {
-
         Map<String, String> body = Map.of("matchId", id);
 
-        return webClient.post().uri("http://localhost:8084/quote").body(body, Map.class).retrieve().bodyToMono(String.class).then();
+        return webClient.post()
+                .uri("http://localhost:8084/quote")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .onErrorResume(throwable -> {
+                    logger.error("Error al crear la cita: " + throwable.getMessage());
+                    return Mono.error(new RuntimeException("Error al crear la cita", throwable));
+                });
     }
 
     private Mono<? extends User> applyUser(Throwable e) {
