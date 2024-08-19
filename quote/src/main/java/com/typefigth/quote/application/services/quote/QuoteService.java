@@ -3,26 +3,21 @@ package com.typefigth.quote.application.services.quote;
 
 import com.typefigth.quote.domain.models.quote.Quote;
 import com.typefigth.quote.domain.ports.in.quote.CreateQuoteUseCase;
-import com.typefigth.quote.domain.ports.in.quote.GetQuoteUseCase;
-import com.typefigth.quote.domain.ports.in.quote.ListQuotesUseCase;
+import com.typefigth.quote.domain.ports.in.quote.GetQuoteByMatchIdUseCase;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class QuoteService implements CreateQuoteUseCase, GetQuoteUseCase, ListQuotesUseCase {
+public class QuoteService implements CreateQuoteUseCase, GetQuoteByMatchIdUseCase {
     private final CreateQuoteUseCase createQuoteUseCase;
 
-    private final GetQuoteUseCase getQuoteUseCase;
-
-    private final ListQuotesUseCase listQuoteUseCase;
+    private final GetQuoteByMatchIdUseCase getQuoteByMatchIdUseCase;
 
 
-    public QuoteService(CreateQuoteUseCase createQuoteUseCase, GetQuoteUseCase getQuoteUseCase, ListQuotesUseCase listQuoteUseCase) {
+    public QuoteService(CreateQuoteUseCase createQuoteUseCase, GetQuoteByMatchIdUseCase getQuoteByMatchIdUseCase) {
         this.createQuoteUseCase = createQuoteUseCase;
-        this.getQuoteUseCase = getQuoteUseCase;
-        this.listQuoteUseCase = listQuoteUseCase;
+        this.getQuoteByMatchIdUseCase = getQuoteByMatchIdUseCase;
     }
 
     @Override
@@ -31,14 +26,10 @@ public class QuoteService implements CreateQuoteUseCase, GetQuoteUseCase, ListQu
     }
 
     @Override
-    public Optional<Quote> getQuote(String id) {
-        return this.getQuoteUseCase.getQuote(id);
+    public List<Quote> getQuoteByMatchId(String id) {
+        return this.getQuoteByMatchIdUseCase.getQuoteByMatchId(id);
     }
 
-    @Override
-    public List<Quote> listQuotes() {
-        return this.listQuoteUseCase.listQuotes();
-    }
 
 }
 

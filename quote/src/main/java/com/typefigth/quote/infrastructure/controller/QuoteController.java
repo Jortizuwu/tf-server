@@ -20,41 +20,34 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/quotes")
+@RequestMapping("/quote")
 public class QuoteController {
 
     private final Logger logger = LoggerFactory.getLogger(QuoteController.class);
 
     private final ExternalService externalService;
     private final QuoteService quoteServices;
-    private final QuoteMapper quoteMapper;
 
-    private static final String USER_NOT_FOUND = "Quote with id %s not found";
 
     public QuoteController(QuoteService quoteServices, QuoteMapper quoteMapper, ExternalService externalService) {
         this.quoteServices = quoteServices;
-        this.quoteMapper = quoteMapper;
         this.externalService = externalService;
     }
 
     @Transactional(readOnly = true)
-    @GetMapping()
-    public ResponseEntity<List<QuoteDto>> listQuotes() {
+    @GetMapping("/match/{id}")
+    public ResponseEntity<List<QuoteDto>> getQuote(@PathVariable String id) {
+        List<Quote> quotes = this.quoteServices.getQuoteByMatchId(id);
 
-        List<Quote> quotes = this.quoteServices.listQuotes();
-
-        List<QuoteDto> quotesDto = quotes.stream().map(quoteMapper::fromQuote).toList();
-
-        return ResponseEntity.status(HttpStatus.OK).body(quotesDto);
-    }
-
-    @Transactional(readOnly = true)
-    @GetMapping("/{id}")
-    public ResponseEntity<QuoteDto> getQuote(@PathVariable String id) {
-        Quote quote = this.quoteServices.getQuote(id).orElseThrow(() -> new ResourceNotFoundException(String.format(USER_NOT_FOUND, id)));
-
-        QuoteDto quoteDto = quoteMapper.fromQuote(quote);
-
+        List<QuoteDto> quoteDto = quotes.stream().map(val -> {
+            QuoteDto dto = new QuoteDto();
+            dto.setId(val.getId());
+            dto.setMatchId(val.getMatchId());
+            dto.setAuthor(val.getAuthor());
+            dto.setContent(val.getContent());
+            dto.setLength(val.getLength());
+            return dto;
+        }).toList();
         return ResponseEntity.status(HttpStatus.OK).body(quoteDto);
     }
 
@@ -77,7 +70,7 @@ public class QuoteController {
             if (quotes.length == 0) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "quotes not found");
             }
-            
+
             for (ExternalQuoteDto quote : quotes) {
                 Quote newQuote = new Quote();
                 newQuote.setAuthor(quote.getAuthor());

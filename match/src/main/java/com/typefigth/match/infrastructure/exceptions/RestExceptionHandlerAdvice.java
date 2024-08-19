@@ -23,6 +23,15 @@ public class RestExceptionHandlerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
+
+    @ExceptionHandler(CreateQuoteException.class)
+    public ResponseEntity<Map<String, String>> handleCreateQuoteException(CreateQuoteException e) {
+        Map<String, String> response = new HashMap<>();
+        response.put(Constants.ERROR, e.getMessage());
+        response.put(Constants.STATUS, HttpStatus.BAD_REQUEST.toString());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleHttpMessageNotReadableException() {
         Map<String, String> response = new HashMap<>();

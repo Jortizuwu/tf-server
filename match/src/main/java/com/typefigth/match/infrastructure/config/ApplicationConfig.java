@@ -1,5 +1,6 @@
 package com.typefigth.match.infrastructure.config;
 
+import com.typefigth.match.application.services.match.ExternalServices;
 import com.typefigth.match.application.services.match.MatchService;
 import com.typefigth.match.application.usecases.match.*;
 import com.typefigth.match.domain.ports.out.match.MatchRepositoryPort;
@@ -31,6 +32,11 @@ public class ApplicationConfig {
                 new CancelMatchUseCaseImpl(matchRepositoryPort),
                 new FinishMatchUseCaseImpl(matchRepositoryPort)
         );
+    }
+
+    @Bean
+    ExternalServices externalServices(WebClient webClient) {
+        return new ExternalServices(webClient);
     }
 
     @Bean

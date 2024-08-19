@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuoteRepositoryPort {
-    Optional<Quote> findById(String id);
-
-    List<Quote> findAll();
+    List<Quote> findByMatchId(String matchId);
 
     Quote save(Quote quote);
 }

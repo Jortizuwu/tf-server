@@ -24,25 +24,18 @@ public class JpaQuoteRepositoryAdapter implements QuoteRepositoryPort {
     }
 
     @Override
-    public Optional<Quote> findById(String id) {
-        Optional<QuoteEntity> optionalQuoteEntity = this.jpaQuoteRepository.findById(id);
+    public List<Quote> findByMatchId(String matchId) {
+        List<QuoteEntity> listQuoteEntity = this.jpaQuoteRepository.findAllByMatchId(matchId);
 
-        if (optionalQuoteEntity.isEmpty()) {
-            return Optional.empty();
+        if (listQuoteEntity.isEmpty()) {
+            return List.of();
         }
-
-        Quote todo = quoteMapper.fromEntity(optionalQuoteEntity.get());
-        return Optional.of(todo);
-    }
-
-    @Override
-    public List<Quote> findAll() {
-        return this.jpaQuoteRepository.findAll().stream().map(quoteMapper::fromEntity).toList();
+        return listQuoteEntity.stream().map(quoteMapper::fromEntity).toList();
     }
 
 
     @Override
-    public Quote save(Quote user) {
-        return this.quoteMapper.fromEntity(this.jpaQuoteRepository.save(quoteMapper.toEntity(user)));
+    public Quote save(Quote quote) {
+        return this.quoteMapper.fromEntity(this.jpaQuoteRepository.save(quoteMapper.toEntity(quote)));
     }
 }

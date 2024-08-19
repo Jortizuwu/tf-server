@@ -2,8 +2,7 @@ package com.typefigth.quote.infrastructure.config;
 
 import com.typefigth.quote.application.services.quote.QuoteService;
 import com.typefigth.quote.application.usecases.quote.CreateQuoteUseCaseImpl;
-import com.typefigth.quote.application.usecases.quote.GetQuoteUseCaseImpl;
-import com.typefigth.quote.application.usecases.quote.ListQuotesUseCaseImpl;
+import com.typefigth.quote.application.usecases.quote.GetQuoteByMatchIdByMatchIdUseCaseImpl;
 import com.typefigth.quote.domain.ports.out.quote.QuoteRepositoryPort;
 import com.typefigth.quote.infrastructure.adapters.quote.JpaQuoteRepositoryAdapter;
 import com.typefigth.quote.infrastructure.adapters.quote.mapper.QuoteMapper;
@@ -17,7 +16,7 @@ public class ApplicationConfig {
 
     @Bean
     public QuoteService quoteService(QuoteRepositoryPort quoteRepositoryPort) {
-        return new QuoteService(new CreateQuoteUseCaseImpl(quoteRepositoryPort), new GetQuoteUseCaseImpl(quoteRepositoryPort), new ListQuotesUseCaseImpl(quoteRepositoryPort));
+        return new QuoteService(new CreateQuoteUseCaseImpl(quoteRepositoryPort), new GetQuoteByMatchIdByMatchIdUseCaseImpl(quoteRepositoryPort));
     }
 
     @Bean

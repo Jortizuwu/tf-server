@@ -3,11 +3,14 @@ package com.typefigth.match.infrastructure.controller;
 import com.typefigth.match.application.dtos.match.AssignMatchDto;
 import com.typefigth.match.application.dtos.match.CreateMatchDto;
 import com.typefigth.match.application.dtos.match.MatchDto;
+import com.typefigth.match.application.services.match.ExternalServices;
 import com.typefigth.match.application.services.match.MatchService;
 import com.typefigth.match.domain.models.Match;
+import com.typefigth.match.domain.models.Quote;
 import com.typefigth.match.domain.models.User;
 import com.typefigth.match.domain.models.enun.Status;
 import com.typefigth.match.infrastructure.adapters.mappers.MatchMapper;
+import com.typefigth.match.infrastructure.exceptions.CreateQuoteException;
 import com.typefigth.match.infrastructure.exceptions.ResourceNotFoundException;
 import com.typefigth.match.infrastructure.utils.Constants;
 import jakarta.validation.Valid;
@@ -17,8 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,20 +34,20 @@ public class MatchController {
 
     private final Logger logger = LoggerFactory.getLogger(MatchController.class);
 
-    private final WebClient webClient;
+    private final ExternalServices externalServices;
 
     private final MatchMapper matchMapper;
 
-    public MatchController(MatchService matchService, WebClient webClient, MatchMapper matchMapper) {
+    public MatchController(MatchService matchService, ExternalServices externalServices, MatchMapper matchMapper) {
         this.matchService = matchService;
-        this.webClient = webClient;
+        this.externalServices = externalServices;
         this.matchMapper = matchMapper;
     }
 
     @Transactional(readOnly = true)
     @GetMapping()
     public ResponseEntity<List<MatchDto>> listMatches() {
-        List<MatchDto> matches = this.matchService.listMatch().stream().map(this::createMatchDtoWithUsersList).toList();
+        List<MatchDto> matches = this.matchService.listMatch().stream().map(this::createMatchDtoWithUsersAndQuotesList).toList();
         return ResponseEntity.status(HttpStatus.OK).body(matches);
     }
 
@@ -54,7 +55,8 @@ public class MatchController {
     @GetMapping("/{id}")
     public ResponseEntity<MatchDto> getMatch(@PathVariable String id) {
         Match matchDb = this.findMatch(id);
-        MatchDto matchDto = this.createMatchDtoWithUsersList(matchDb);
+        MatchDto matchDto = this.createMatchDtoWithUsersAndQuotesList(matchDb);
+
         return ResponseEntity.status(HttpStatus.OK).body(matchDto);
     }
 
@@ -62,7 +64,7 @@ public class MatchController {
     @PostMapping
     public ResponseEntity<MatchDto> createMatch(@Valid @RequestBody CreateMatchDto body) {
 
-        User user = this.findUserById(body.getOwnId());
+        User user = this.externalServices.findUserById(body.getOwnId());
 
         if (user == null || user.getUid() == null) {
             throw new ResourceNotFoundException(String.format("error user with id: %s not found", body.getOwnId()));
@@ -72,7 +74,7 @@ public class MatchController {
         match.setOwnId(body.getOwnId());
 
         Match newMatch = this.matchService.createMatch(match);
-        MatchDto matchDto = this.createMatchDtoWithUsersList(newMatch);
+        MatchDto matchDto = this.createMatchDtoWithUsersAndQuotesList(newMatch);
         return ResponseEntity.status(HttpStatus.OK).body(matchDto);
     }
 
@@ -95,7 +97,7 @@ public class MatchController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        User opponent = this.findUserById(body.getOpponentId());
+        User opponent = this.externalServices.findUserById(body.getOpponentId());
 
         if (opponent == null) {
             response.put(Constants.ERROR, "Opps!! sorry but can`t assign an opponent to this match, because user not found");
@@ -103,8 +105,12 @@ public class MatchController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
+        this.externalServices.createQuote(matchId).doOnError(throwable -> {
+            throw new CreateQuoteException(throwable.getMessage());
+        });
+
         Match matchWithOpponent = this.matchService.assignOpponentToMatch(matchDb, body.getOpponentId());
-        MatchDto matchDto = this.createMatchDtoWithUsersList(matchWithOpponent);
+        MatchDto matchDto = this.createMatchDtoWithUsersAndQuotesList(matchWithOpponent);
 
         return ResponseEntity.status(HttpStatus.OK).body(matchDto);
     }
@@ -150,30 +156,26 @@ public class MatchController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    private MatchDto createMatchDtoWithUsersList(Match match) {
+    private MatchDto createMatchDtoWithUsersAndQuotesList(Match match) {
         List<String> usersId = List.of(match.getOwnId(), match.getOpponentId() != null ? match.getOpponentId() : "");
         List<User> users = new ArrayList<>();
         for (String id : usersId) {
             if (!id.isEmpty()) {
-                User user = findUserById(id);
+                User user = this.externalServices.findUserById(id);
                 if (user != null) {
                     users.add(user);
                 }
             }
         }
-        return matchMapper.toDto(match, users);
+
+        List<Quote> quotes = this.externalServices.listQuoteByMatchId(match.getId());
+
+        return matchMapper.toDto(match, users, quotes);
     }
 
     private Match findMatch(String id) throws ResourceNotFoundException {
         return this.matchService.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("error match with id: %s not found", id)));
     }
 
-    private User findUserById(String id) {
-        return webClient.get().uri("http://localhost:8080/user/" + id).retrieve().bodyToMono(User.class).onErrorResume(this::apply).block();
-    }
 
-    private Mono<? extends User> apply(Throwable e) {
-        logger.error("Error fetching user data: {}", e.getMessage());
-        return Mono.just(new User());
-    }
 }

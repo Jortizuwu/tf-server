@@ -3,7 +3,6 @@ package com.typefigth.match.domain.models;
 import com.typefigth.match.domain.models.enun.Status;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class Match {
 

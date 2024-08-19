@@ -1,6 +1,7 @@
 package com.typefigth.match.application.dtos.match;
 
 
+import com.typefigth.match.domain.models.Quote;
 import com.typefigth.match.domain.models.User;
 import com.typefigth.match.domain.models.enun.Status;
 
@@ -16,8 +17,9 @@ public class MatchDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<User> users;
+    private List<Quote> quotes;
 
-    public MatchDto(String id, String ownId, String opponentId, Status status, List<User> users, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public MatchDto(String id, String ownId, String opponentId, Status status, List<User> users, List<Quote> quotes, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -25,6 +27,7 @@ public class MatchDto {
         this.opponentId = opponentId;
         this.status = status;
         this.users = users;
+        this.quotes = quotes;
     }
 
     public MatchDto() {
@@ -70,6 +73,14 @@ public class MatchDto {
         this.users = users;
     }
 
+    public List<Quote> getQuotes() {
+        return quotes;
+    }
+
+    public void setQuotes(List<Quote> quotes) {
+        this.quotes = quotes;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -93,6 +104,7 @@ public class MatchDto {
         private String opponentId;
         private Status status;
         private List<User> users;
+        private List<Quote> quotes;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
 
@@ -121,6 +133,11 @@ public class MatchDto {
             return this;
         }
 
+        public MatchBuilder setQuotes(List<Quote> quotes) {
+            this.quotes = quotes;
+            return this;
+        }
+
         public MatchBuilder setCreatedAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
@@ -132,7 +149,7 @@ public class MatchDto {
         }
 
         public MatchDto build() {
-            return new MatchDto(id, ownId, opponentId, status, users, createdAt, updatedAt);
+            return new MatchDto(id, ownId, opponentId, status, users, quotes,createdAt, updatedAt);
         }
     }
 

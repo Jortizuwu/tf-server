@@ -5,8 +5,8 @@ import com.typefigth.quote.domain.models.quote.Quote;
 
 import java.util.List;
 
-public interface ListQuotesUseCase {
+public interface GetQuoteByMatchIdUseCase {
 
-    List<Quote> listQuotes();
+    List<Quote> getQuoteByMatchId(String matchId);
 
 }

@@ -1,4 +1,4 @@
-package com.typefigth.quote.domain.models.quote;
+package com.typefigth.match.domain.models;
 
 
 public class Quote {
