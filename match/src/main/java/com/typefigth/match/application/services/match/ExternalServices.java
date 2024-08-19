@@ -29,7 +29,7 @@ public class ExternalServices {
         return webClient.get().uri("http://localhost:8084/quote/match/" + id).retrieve().bodyToMono(List.class).onErrorResume(this::applyQuote).block();
     }
 
-    public Mono<Void> createQuote(String id) {
+    public Mono<?> createQuote(String id) {
         Map<String, String> body = Map.of("matchId", id);
 
         return webClient.post()
@@ -37,11 +37,7 @@ public class ExternalServices {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .retrieve()
-                .bodyToMono(Void.class)
-                .onErrorResume(throwable -> {
-                    logger.error("Error al crear la cita: " + throwable.getMessage());
-                    return Mono.error(new RuntimeException("Error al crear la cita", throwable));
-                });
+                .bodyToMono(Quote.class);
     }
 
     private Mono<? extends User> applyUser(Throwable e) {

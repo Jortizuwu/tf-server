@@ -110,8 +110,7 @@ public class MatchController {
                 .doOnError(throwable -> {
                     this.logger.error(throwable.getMessage());
                     throw new CreateQuoteException(throwable.getMessage());
-                });
-
+                }).block();
 
         Match matchWithOpponent = this.matchService.assignOpponentToMatch(matchDb, body.getOpponentId());
         MatchDto matchDto = this.createMatchDtoWithUsersAndQuotesList(matchWithOpponent);
