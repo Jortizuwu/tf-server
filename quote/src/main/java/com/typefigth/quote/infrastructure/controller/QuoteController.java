@@ -2,43 +2,49 @@ package com.typefigth.quote.infrastructure.controller;
 
 import com.typefigth.quote.application.dtos.quote.CreateQuoteDto;
 import com.typefigth.quote.application.dtos.quote.QuoteDto;
+import com.typefigth.quote.application.services.quote.ExternalService;
 import com.typefigth.quote.application.services.quote.QuoteService;
 import com.typefigth.quote.domain.models.quote.Quote;
 import com.typefigth.quote.infrastructure.adapters.quote.mapper.QuoteMapper;
 import com.typefigth.quote.infrastructure.exceptions.ResourceNotFoundException;
-import com.typefigth.quote.infrastructure.repository.JpaQuoteRepository;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
 @RequestMapping("/quotes")
 public class QuoteController {
 
+    private Logger logger = LoggerFactory.getLogger(QuoteController.class);
+
+    private final ExternalService externalService;
     private final QuoteService quoteServices;
-    private final JpaQuoteRepository jpaQuoteRepository;
     private final QuoteMapper quoteMapper;
 
     private static final String USER_NOT_FOUND = "Quote with id %s not found";
 
-    public QuoteController(QuoteService quoteServices, JpaQuoteRepository jpaQuoteRepository, QuoteMapper quoteMapper) {
+    public QuoteController(QuoteService quoteServices, QuoteMapper quoteMapper, ExternalService externalService) {
         this.quoteServices = quoteServices;
-        this.jpaQuoteRepository = jpaQuoteRepository;
         this.quoteMapper = quoteMapper;
+        this.externalService = externalService;
     }
 
     @Transactional(readOnly = true)
     @GetMapping()
     public ResponseEntity<List<QuoteDto>> listQuotes() {
-        List<Quote> users = this.quoteServices.listQuotes();
 
-        List<QuoteDto> usersDto = users.stream().map(quoteMapper::fromQuote).toList();
+        List<Quote> quotes = this.quoteServices.listQuotes();
 
-        return ResponseEntity.status(HttpStatus.OK).body(usersDto);
+        List<QuoteDto> quotesDto = quotes.stream().map(quoteMapper::fromQuote).toList();
+
+        return ResponseEntity.status(HttpStatus.OK).body(Arrays.stream(this.externalService.getRandomQuote().block()).toList().stream().map(quoteMapper::fromQuote).toList());
     }
 
     @Transactional(readOnly = true)
