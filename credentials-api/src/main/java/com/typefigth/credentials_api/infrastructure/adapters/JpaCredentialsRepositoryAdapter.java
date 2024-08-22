@@ -8,8 +8,9 @@ import com.typefigth.credentials_api.domain.ports.out.CredentialsRepositoryPort;
 import com.typefigth.credentials_api.infrastructure.adapters.mapper.UserMapper;
 import com.typefigth.credentials_api.infrastructure.entity.UserEntity;
 import com.typefigth.credentials_api.infrastructure.repository.JpaCredentialsRepository;
+import com.typefigth.credentials_api.infrastructure.utils.Constants;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwe;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,6 @@ public class JpaCredentialsRepositoryAdapter implements CredentialsRepositoryPor
     private final JpaCredentialsRepository jpaCredentialsRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final SecretKey key = Jwts.SIG.HS256.key().build();
 
     public JpaCredentialsRepositoryAdapter(JpaCredentialsRepository jpaCredentialsRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.jpaCredentialsRepository = jpaCredentialsRepository;
@@ -64,7 +64,7 @@ public class JpaCredentialsRepositoryAdapter implements CredentialsRepositoryPor
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationTimeMillis);
 
-        String jwtToken = Jwts.builder().subject(payload.getUid()).expiration(expiryDate).signWith(key).compact();
+        String jwtToken = Jwts.builder().claim("uid", payload.getUid()).claim("expiresAt", expiryDate).expiration(expiryDate).signWith(Constants.SECRET_KEY).compact();
         Map<String, String> jwtTokenGen = new HashMap<>();
         jwtTokenGen.put("token", jwtToken);
         return jwtTokenGen;
@@ -72,7 +72,10 @@ public class JpaCredentialsRepositoryAdapter implements CredentialsRepositoryPor
 
     @Override
     public Token validate(String token) {
-        Jwe<Claims> jws = Jwts.parser().verifyWith(key).build().parseEncryptedClaims(token);
+        Jws<Claims> jws = Jwts.parser()
+                .verifyWith(Constants.SECRET_KEY)
+                .build()
+                .parseSignedClaims(token);
         return new Token(jws.getPayload().getSubject(), LocalDateTime.now().plusMinutes(2));
     }
 }

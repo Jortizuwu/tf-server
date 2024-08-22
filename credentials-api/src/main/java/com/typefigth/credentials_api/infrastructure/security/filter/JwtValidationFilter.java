@@ -1,6 +1,5 @@
 package com.typefigth.credentials_api.infrastructure.security.filter;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typefigth.credentials_api.infrastructure.security.SimpleGrantedAuthorityJsonCreator;
 import com.typefigth.credentials_api.infrastructure.utils.Constants;
@@ -25,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class JwtValidationFilter extends BasicAuthenticationFilter {
 
     public JwtValidationFilter(AuthenticationManager authenticationManager) {
@@ -32,7 +32,8 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
         String header = request.getHeader(Constants.HEADER_AUTHORIZATION);
 
@@ -44,12 +45,17 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
 
         try {
             Claims claims = Jwts.parser().verifyWith(Constants.SECRET_KEY).build().parseSignedClaims(token).getPayload();
-            String username = claims.getSubject();
+            String uid = claims.getSubject();
             Object authoritiesClaims = claims.get("authorities");
 
-            Collection<? extends GrantedAuthority> authorities = Arrays.asList(new ObjectMapper().addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityJsonCreator.class).readValue(authoritiesClaims.toString().getBytes(), SimpleGrantedAuthority[].class));
+            Collection<? extends GrantedAuthority> authorities = Arrays.asList(
+                    new ObjectMapper()
+                            .addMixIn(SimpleGrantedAuthority.class,
+                                    SimpleGrantedAuthorityJsonCreator.class)
+                            .readValue(authoritiesClaims.toString().getBytes(), SimpleGrantedAuthority[].class)
+            );
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(uid, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             chain.doFilter(request, response);
         } catch (JwtException e) {

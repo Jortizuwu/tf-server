@@ -12,47 +12,43 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> {
-    @Override
-    public GatewayFilter apply(AuthFilter.Config config) {
-        return null;
+
+    private final WebClient.Builder webClient;
+
+    public AuthFilter(WebClient.Builder webClient) {
+        super(Config.class);
+        this.webClient = webClient;
     }
 
-//    private final WebClient.Builder webClient;
-//
-//    public AuthFilter(WebClient.Builder webClient){
-//        super(Config.class);
-//        this.webClient = webClient;
-//    }
-//
-//    @Override
-//    public GatewayFilter apply(Config config) {
-//        return ((((exchange, chain) -> {
-//            if(!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION))
-//                return onError(exchange, HttpStatus.BAD_REQUEST);
-//            String tokenHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
-//            String[] chunks = tokenHeader.split(" ");
-//            if(chunks.length != 2 || !chunks[0].equals("Bearer"))
-//                return onError(exchange,HttpStatus.BAD_REQUEST);
-//            return webClient.build()
-//                    .post()
-//                    .uri("http://auth-service/auth/validate?token=" + chunks[1])
-//                    .bodyValue(new RequestDto(exchange.getRequest().getPath().toString(),exchange.getRequest().getMethod().toString()))
-//                    .retrieve()
-//                    .bodyToMono(TokenDto.class)
-//                    .map(t -> {
-//                        t.getToken();
-//                        return exchange;
-//                    }).flatMap(chain::filter);
-//        })));
-//    }
-//
-//    public Mono<Void> onError(ServerWebExchange exchange,HttpStatus httpStatus){
-//        ServerHttpResponse response = exchange.getResponse();
-//        response.setStatusCode(httpStatus);
-//        return response.setComplete();
-//    }
-//
-    public static class Config{
+    @Override
+    public GatewayFilter apply(Config config) {
+        return ((((exchange, chain) -> {
+            if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION))
+                return onError(exchange, HttpStatus.BAD_REQUEST);
+            String tokenHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
+            String[] chunks = tokenHeader.split(" ");
+            if (chunks.length != 2 || !chunks[0].equals("Bearer"))
+                return onError(exchange, HttpStatus.BAD_REQUEST);
+            return webClient.build()
+                    .post()
+                    .uri("http://auth-service/auth/validate?token=" + chunks[1])
+                    .bodyValue(new RequestDto(exchange.getRequest().getPath().toString(), exchange.getRequest().getMethod().toString()))
+                    .retrieve()
+                    .bodyToMono(TokenDto.class)
+                    .map(t -> {
+                        t.getToken();
+                        return exchange;
+                    }).flatMap(chain::filter);
+        })));
+    }
+
+    public Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus) {
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(httpStatus);
+        return response.setComplete();
+    }
+
+    public static class Config {
 
     }
 

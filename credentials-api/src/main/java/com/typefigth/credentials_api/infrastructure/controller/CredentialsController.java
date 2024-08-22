@@ -12,9 +12,9 @@ import com.typefigth.credentials_api.domain.models.enun.Status;
 import com.typefigth.credentials_api.infrastructure.adapters.mapper.UserMapper;
 import com.typefigth.credentials_api.infrastructure.exceptions.BadCredentialsException;
 import com.typefigth.credentials_api.infrastructure.repository.JpaCredentialsRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.aspectj.weaver.patterns.IToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +51,6 @@ public class CredentialsController {
 
         token.setToken(this.credentialsService.generateToken(payload).get("token"));
 
-
         CredentialsDto credentialsDto = userMapper.fromUser(user, token);
 
         return ResponseEntity.status(HttpStatus.OK).body(credentialsDto);
@@ -84,6 +83,21 @@ public class CredentialsController {
         token.setToken(credentialsService.generateToken(payload).get("token"));
 
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.fromUser(newUser, token));
+    }
+
+    @Transactional()
+    @PostMapping("/validate")
+    public ResponseEntity<Token> validate(HttpServletRequest request) {
+
+
+        String token = request.getHeader("Authorization");
+        if (token == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        System.out.println(token);
+//        Token tokenDto = credentialsService.validate(token);
+        return ResponseEntity.ok(null);
     }
 
 
