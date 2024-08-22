@@ -1,7 +1,6 @@
 package com.typefigth.credentials_api.infrastructure.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.typefigth.credentials_api.infrastructure.security.SimpleGrantedAuthorityJsonCreator;
 import com.typefigth.credentials_api.infrastructure.utils.Constants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -13,14 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,8 +52,8 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
         } catch (JwtException e) {
             Map<String, String> body = new HashMap<>();
-            body.put("error", e.getMessage());
-            body.put("message", "El token JWT es invalido!");
+            body.put(Constants.ERROR, e.getMessage());
+            body.put(Constants.STATUS, "token not valid");
 
             response.getWriter().write(new ObjectMapper().writeValueAsString(body));
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

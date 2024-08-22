@@ -1,5 +1,6 @@
 package com.typefigth.api_gateway.infrastructure.exceptions;
 
+import org.apache.logging.log4j.util.Constants;
 import org.springframework.cloud.gateway.support.ServiceUnavailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,5 +19,13 @@ public class RestExceptionHandlerAdvice {
         response.put("error", e.getMessage());
         response.put("status", HttpStatus.NOT_FOUND.toString());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(UnAuthenticationException.class)
+    public ResponseEntity<Map<String, String>> handleNotFoundException(UnAuthenticationException e) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", e.getMessage());
+        response.put("status", HttpStatus.UNAUTHORIZED.toString());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 }
