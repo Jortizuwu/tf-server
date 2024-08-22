@@ -5,6 +5,7 @@ import com.typefigth.credentials_api.application.service.CredentialsService;
 import com.typefigth.credentials_api.application.usecases.GenerateTokenUseCaseImpl;
 import com.typefigth.credentials_api.application.usecases.SignInUseCaseImpl;
 import com.typefigth.credentials_api.application.usecases.SignUpUseCaseImpl;
+import com.typefigth.credentials_api.application.usecases.ValidateTokenUseCaseImpl;
 import com.typefigth.credentials_api.domain.ports.out.CredentialsRepositoryPort;
 import com.typefigth.credentials_api.infrastructure.adapters.JpaCredentialsRepositoryAdapter;
 import com.typefigth.credentials_api.infrastructure.adapters.mapper.UserMapper;
@@ -16,15 +17,16 @@ import org.springframework.context.annotation.Configuration;
 public class ApplicationConfig {
 
     @Bean
-    public CredentialsService credentialsService(CredentialsRepositoryPort userRepositoryPort) {
+    public CredentialsService credentialsService(CredentialsRepositoryPort credentialsRepositoryPort) {
         return new CredentialsService(
-                new SignInUseCaseImpl(userRepositoryPort),
-                new SignUpUseCaseImpl(userRepositoryPort),
-                new GenerateTokenUseCaseImpl(userRepositoryPort));
+                new SignInUseCaseImpl(credentialsRepositoryPort),
+                new SignUpUseCaseImpl(credentialsRepositoryPort),
+                new GenerateTokenUseCaseImpl(credentialsRepositoryPort),
+                new ValidateTokenUseCaseImpl(credentialsRepositoryPort));
     }
 
     @Bean
-    public CredentialsRepositoryPort userRepositoryPort(JpaCredentialsRepositoryAdapter jpaCredentialsRepositoryAdapter) {
+    public CredentialsRepositoryPort credentialsRepositoryPort(JpaCredentialsRepositoryAdapter jpaCredentialsRepositoryAdapter) {
         return jpaCredentialsRepositoryAdapter;
     }
 
@@ -32,6 +34,4 @@ public class ApplicationConfig {
     public UserMapper userMapper() {
         return new UserMapperAdapter();
     }
-
-    
 }

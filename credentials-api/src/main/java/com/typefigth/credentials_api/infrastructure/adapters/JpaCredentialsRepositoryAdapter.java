@@ -2,12 +2,16 @@ package com.typefigth.credentials_api.infrastructure.adapters;
 
 
 import com.typefigth.credentials_api.domain.models.Payload;
+import com.typefigth.credentials_api.domain.models.Token;
 import com.typefigth.credentials_api.domain.models.User;
 import com.typefigth.credentials_api.domain.ports.out.CredentialsRepositoryPort;
 import com.typefigth.credentials_api.infrastructure.adapters.mapper.UserMapper;
 import com.typefigth.credentials_api.infrastructure.entity.UserEntity;
 import com.typefigth.credentials_api.infrastructure.repository.JpaCredentialsRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwe;
 import io.jsonwebtoken.Jwts;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -22,16 +26,18 @@ public class JpaCredentialsRepositoryAdapter implements CredentialsRepositoryPor
 
     private final JpaCredentialsRepository jpaCredentialsRepository;
     private final UserMapper userMapper;
-
+    private final PasswordEncoder passwordEncoder;
     private final SecretKey key = Jwts.SIG.HS256.key().build();
 
-    public JpaCredentialsRepositoryAdapter(JpaCredentialsRepository jpaCredentialsRepository, UserMapper userMapper) {
+    public JpaCredentialsRepositoryAdapter(JpaCredentialsRepository jpaCredentialsRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.jpaCredentialsRepository = jpaCredentialsRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public User SignUp(User user) {
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
         return this.userMapper.fromEntity(this.jpaCredentialsRepository.save(userMapper.toEntity(user)));
     }
 
@@ -43,7 +49,7 @@ public class JpaCredentialsRepositoryAdapter implements CredentialsRepositoryPor
             return Optional.empty();
         }
 
-        if (!optionalUserEntity.get().getPassword().equals(password)) {
+        if (!this.passwordEncoder.matches(password, optionalUserEntity.get().getPassword())) {
             return Optional.empty();
         }
 
@@ -58,9 +64,15 @@ public class JpaCredentialsRepositoryAdapter implements CredentialsRepositoryPor
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationTimeMillis);
 
-        String jwtToken = Jwts.builder().subject(payload.getUid()).claim("exp", Jwts.builder()).expiration(expiryDate).signWith(key).compact();
+        String jwtToken = Jwts.builder().subject(payload.getUid()).expiration(expiryDate).signWith(key).compact();
         Map<String, String> jwtTokenGen = new HashMap<>();
         jwtTokenGen.put("token", jwtToken);
         return jwtTokenGen;
+    }
+
+    @Override
+    public Token validate(String token) {
+        Jwe<Claims> jws = Jwts.parser().verifyWith(key).build().parseEncryptedClaims(token);
+        return new Token(jws.getPayload().getSubject(), LocalDateTime.now().plusMinutes(2));
     }
 }

@@ -1,6 +1,7 @@
 package com.typefigth.credentials_api.domain.ports.out;
 
 import com.typefigth.credentials_api.domain.models.Payload;
+import com.typefigth.credentials_api.domain.models.Token;
 import com.typefigth.credentials_api.domain.models.User;
 
 import java.util.Map;
@@ -14,4 +15,5 @@ public interface CredentialsRepositoryPort {
 
     Map<String, String> generateToken(Payload payload);
 
+    Token validate(String token);
 }
