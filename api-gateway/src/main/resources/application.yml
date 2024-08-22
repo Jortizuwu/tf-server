@@ -25,6 +25,7 @@ spring:
             - Path=/api/v1/user/**
           filters:
             - StripPrefix=2
+            - AuthFilter
 
         - id: MATCH-SERVICE
           uri: lb://MATCH-SERVICE
@@ -32,6 +33,7 @@ spring:
             - Path=/api/v1/match/**
           filters:
             - StripPrefix=2
+            - AuthFilter
 
         - id: QUOTE-SERVICE
           uri: lb://QUOTE-SERVICE
@@ -39,6 +41,7 @@ spring:
             - Path=/api/v1/quote/**
           filters:
             - StripPrefix=2
+            - AuthFilter
 
         - id: DISCOVERY-SERVICE
           uri: http://localhost:8761
@@ -46,6 +49,7 @@ spring:
             - Path=/discovery/web
           filters:
             - SetPath=/
+            - AuthFilter
 
         - id: DISCOVERY-SERVICE-STATIC
           uri: http://localhost:8761
@@ -53,6 +57,7 @@ spring:
             - Path=/discovery/**
           filters:
             - SetPath=/
+            - AuthFilter
 
 logging:
   level:

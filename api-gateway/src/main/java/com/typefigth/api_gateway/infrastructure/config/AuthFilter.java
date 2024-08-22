@@ -1,5 +1,6 @@
 package com.typefigth.api_gateway.infrastructure.config;
 
+import com.typefigth.api_gateway.application.dtos.TokenDto;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -23,22 +24,19 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
     @Override
     public GatewayFilter apply(Config config) {
         return ((((exchange, chain) -> {
+
             if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION))
-                return onError(exchange, HttpStatus.BAD_REQUEST);
+                return onError(exchange, HttpStatus.UNAUTHORIZED);
+
             String tokenHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
             String[] chunks = tokenHeader.split(" ");
-            if (chunks.length != 2 || !chunks[0].equals("Bearer"))
-                return onError(exchange, HttpStatus.BAD_REQUEST);
-            return webClient.build()
-                    .post()
-                    .uri("http://auth-service/auth/validate?token=" + chunks[1])
-                    .bodyValue(new RequestDto(exchange.getRequest().getPath().toString(), exchange.getRequest().getMethod().toString()))
-                    .retrieve()
-                    .bodyToMono(TokenDto.class)
-                    .map(t -> {
-                        t.getToken();
-                        return exchange;
-                    }).flatMap(chain::filter);
+
+            if (chunks.length != 2 || !chunks[0].equals("Bearer")) 
+                return onError(exchange, HttpStatus.UNAUTHORIZED);
+
+            return webClient.build().post().uri("http://localhost:8085/auth/validate").header(HttpHeaders.AUTHORIZATION, "Bearer " + chunks[1]).retrieve().bodyToMono(TokenDto.class).map(t -> {
+                return exchange;
+            }).flatMap(chain::filter);
         })));
     }
 

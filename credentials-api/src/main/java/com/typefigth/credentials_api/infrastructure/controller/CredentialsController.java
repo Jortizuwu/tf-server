@@ -88,16 +88,12 @@ public class CredentialsController {
     @Transactional()
     @PostMapping("/validate")
     public ResponseEntity<Token> validate(HttpServletRequest request) {
-
-
         String token = request.getHeader("Authorization");
         if (token == null) {
             return ResponseEntity.badRequest().build();
         }
-
-        System.out.println(token);
-//        Token tokenDto = credentialsService.validate(token);
-        return ResponseEntity.ok(null);
+        Token tokenDto = credentialsService.validate(token.substring(7));
+        return ResponseEntity.ok(tokenDto);
     }
 
 

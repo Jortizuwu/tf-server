@@ -32,8 +32,7 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         String header = request.getHeader(Constants.HEADER_AUTHORIZATION);
 
@@ -45,17 +44,15 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
 
         try {
             Claims claims = Jwts.parser().verifyWith(Constants.SECRET_KEY).build().parseSignedClaims(token).getPayload();
-            String uid = claims.getSubject();
-            Object authoritiesClaims = claims.get("authorities");
+            Object uid = claims.get("uid");
+//            Collection<? extends GrantedAuthority> authorities = Arrays.asList(
+//                    new ObjectMapper()
+//                            .addMixIn(SimpleGrantedAuthority.class,
+//                                    SimpleGrantedAuthorityJsonCreator.class)
+//                            .readValue(authoritiesClaims.toString().getBytes(), SimpleGrantedAuthority[].class)
+//            );
 
-            Collection<? extends GrantedAuthority> authorities = Arrays.asList(
-                    new ObjectMapper()
-                            .addMixIn(SimpleGrantedAuthority.class,
-                                    SimpleGrantedAuthorityJsonCreator.class)
-                            .readValue(authoritiesClaims.toString().getBytes(), SimpleGrantedAuthority[].class)
-            );
-
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(uid, null, authorities);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(uid, null, null);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             chain.doFilter(request, response);
         } catch (JwtException e) {

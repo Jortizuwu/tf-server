@@ -15,7 +15,6 @@ import io.jsonwebtoken.Jwts;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -76,6 +75,6 @@ public class JpaCredentialsRepositoryAdapter implements CredentialsRepositoryPor
                 .verifyWith(Constants.SECRET_KEY)
                 .build()
                 .parseSignedClaims(token);
-        return new Token(jws.getPayload().getSubject(), LocalDateTime.now().plusMinutes(2));
+        return new Token((String) jws.getPayload().get("token"), LocalDateTime.now().plusMinutes(2));
     }
 }
