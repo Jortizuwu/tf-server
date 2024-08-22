@@ -23,6 +23,7 @@
         <module>match</module>
         <module>quote</module>
         <module>api-gateway</module>
+        <module>credentials-api</module>
     </modules>
 
     <properties>
