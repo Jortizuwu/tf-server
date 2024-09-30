@@ -18,8 +18,6 @@ public class UpdateUserDto {
     @Email(message = "Email is not valid")
     private String email;
 
-    private String name;
-
     private Status status;
 
     public String getNickname() {
@@ -44,14 +42,6 @@ public class UpdateUserDto {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Status getStatus() {

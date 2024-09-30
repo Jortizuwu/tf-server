@@ -11,17 +11,15 @@ public class CredentialsDto {
     private String uid;
     private String nickname;
     private String email;
-    private String name;
     private Status status;
     private Token token;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public CredentialsDto(String uid, String nickname, String email, String name, Status status, Token token, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public CredentialsDto(String uid, String nickname, String email, Status status, Token token, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.uid = uid;
         this.nickname = nickname;
         this.email = email;
-        this.name = name;
         this.status = status;
         this.token = token;
         this.createdAt = createdAt;
@@ -53,14 +51,6 @@ public class CredentialsDto {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Status getStatus() {
@@ -102,7 +92,6 @@ public class CredentialsDto {
         private String uid;
         private String nickname;
         private String email;
-        private String name;
         private Status status;
         private Token token;
         private LocalDateTime createdAt;
@@ -123,10 +112,6 @@ public class CredentialsDto {
             return this;
         }
 
-        public UserDtoBuilder setName(String name) {
-            this.name = name;
-            return this;
-        }
 
         public UserDtoBuilder setStatus(Status status) {
             this.status = status;
@@ -150,7 +135,7 @@ public class CredentialsDto {
 
 
         public CredentialsDto build() {
-            return new CredentialsDto(uid, nickname, email, name, status, token, createdAt, updatedAt);
+            return new CredentialsDto(uid, nickname, email, status, token, createdAt, updatedAt);
         }
 
     }

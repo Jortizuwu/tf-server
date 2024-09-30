@@ -75,7 +75,6 @@ public class CredentialsController {
         user.setNickname(body.getNickname());
         user.setPassword(body.getPassword());
         user.setEmail(body.getEmail());
-        user.setName(body.getName());
 
         User newUser = this.credentialsService.SignUp(user);
 

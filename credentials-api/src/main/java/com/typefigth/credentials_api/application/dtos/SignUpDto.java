@@ -21,10 +21,6 @@ public class SignUpDto {
     @NotEmpty(message = "Email cannot be empty")
     private String email;
 
-    @NotNull(message = "Name cannot be null")
-    @NotEmpty(message = "Name cannot be empty")
-    private String name;
-
     // Getters y Setters
     public String getNickname() {
         return nickname;
@@ -48,13 +44,5 @@ public class SignUpDto {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

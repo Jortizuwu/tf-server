@@ -12,7 +12,6 @@ public class UserMapperAdapter implements UserMapper {
                 .setNickname(user.getNickname())
                 .setPassword(user.getPassword())
                 .setEmail(user.getEmail())
-                .setName(user.getName())
                 .setCreatedAt(user.getCreatedAt())
                 .setUpdatedAt(user.getUpdatedAt())
                 .setStatus(user.getStatus())
@@ -27,7 +26,6 @@ public class UserMapperAdapter implements UserMapper {
                 .setNickname(entity.getNickname())
                 .setPassword(entity.getPassword())
                 .setEmail(entity.getEmail())
-                .setName(entity.getName())
                 .setCreatedAt(entity.getCreatedAt())
                 .setUpdatedAt(entity.getUpdatedAt())
                 .build();
@@ -39,7 +37,6 @@ public class UserMapperAdapter implements UserMapper {
                 .setUid(user.getUid())
                 .setNickname(user.getNickname())
                 .setEmail(user.getEmail())
-                .setName(user.getName())
                 .setStatus(user.getStatus())
                 .setCreatedAt(user.getCreatedAt())
                 .setUpdatedAt(user.getUpdatedAt())

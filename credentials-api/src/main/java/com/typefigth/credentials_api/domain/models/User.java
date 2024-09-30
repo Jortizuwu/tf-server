@@ -10,17 +10,15 @@ public class User {
     private String nickname;
     private String password;
     private String email;
-    private String name;
     private Status status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public User(String uid, String nickname, String password, String email, String name, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public User(String uid, String nickname, String password, String email, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.uid = uid;
         this.nickname = nickname;
         this.password = password;
         this.email = email;
-        this.name = name;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -43,10 +41,6 @@ public class User {
 
     public String getEmail() {
         return email;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public LocalDateTime getUpdatedAt() {
@@ -77,10 +71,6 @@ public class User {
         this.password = password;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public void setStatus(Status status) {
         this.status = status;
     }
@@ -100,10 +90,8 @@ public class User {
         private String password;
         private String email;
         private Status status;
-        private String name;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
-
 
         public UserBuilder setUid(String uid) {
             this.uid = uid;
@@ -125,10 +113,6 @@ public class User {
             return this;
         }
 
-        public UserBuilder setName(String name) {
-            this.name = name;
-            return this;
-        }
 
         public UserBuilder setStatus(Status status) {
             this.status = status;
@@ -146,7 +130,7 @@ public class User {
         }
 
         public User build() {
-            return new User(uid, nickname, password, email, name, status, createdAt, updatedAt);
+            return new User(uid, nickname, password, email, status, createdAt, updatedAt);
         }
     }
 

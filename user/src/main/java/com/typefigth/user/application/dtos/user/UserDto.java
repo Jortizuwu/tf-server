@@ -9,16 +9,14 @@ public class UserDto {
     private String uid;
     private String nickname;
     private String email;
-    private String name;
     private Status status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public UserDto(String uid, String nickname, String email, String name, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public UserDto(String uid, String nickname, String email, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.uid = uid;
         this.nickname = nickname;
         this.email = email;
-        this.name = name;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -51,14 +49,6 @@ public class UserDto {
         this.email = email;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public Status getStatus() {
         return status;
     }
@@ -66,7 +56,6 @@ public class UserDto {
     public void setStatus(Status status) {
         this.status = status;
     }
-
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -84,14 +73,12 @@ public class UserDto {
         this.updatedAt = updatedAt;
     }
 
-
     // build
     public static class UserDtoBuilder {
 
         private String uid;
         private String nickname;
         private String email;
-        private String name;
         private Status status;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
@@ -111,11 +98,6 @@ public class UserDto {
             return this;
         }
 
-        public UserDtoBuilder setName(String name) {
-            this.name = name;
-            return this;
-        }
-
         public UserDtoBuilder setCreatedAt(LocalDateTime createdAt) {
             this.createdAt = createdAt;
             return this;
@@ -132,7 +114,7 @@ public class UserDto {
         }
 
         public UserDto build() {
-            return new UserDto(uid, nickname, email, name, status, createdAt, updatedAt);
+            return new UserDto(uid, nickname, email, status, createdAt, updatedAt);
         }
 
     }

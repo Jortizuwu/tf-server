@@ -24,9 +24,6 @@ public class UserEntity {
     @Column(name = "email", unique = true, nullable = false, length = 150)
     private String email;
 
-    @Column(name = "name", nullable = false, length = 50)
-    private String name;
-
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -49,12 +46,11 @@ public class UserEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public UserEntity(String uid, String nickname, String password, String email, String name, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public UserEntity(String uid, String nickname, String password, String email, Status status, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.uid = uid;
         this.nickname = nickname;
         this.password = password;
         this.email = email;
-        this.name = name;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -77,10 +73,6 @@ public class UserEntity {
 
     public String getEmail() {
         return email;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Status getStatus() {
@@ -111,10 +103,6 @@ public class UserEntity {
         this.email = email;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public void setStatus(Status status) {
         this.status = status;
     }
@@ -133,7 +121,6 @@ public class UserEntity {
         private String nickname;
         private String password;
         private String email;
-        private String name;
         private Status status;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
@@ -158,11 +145,6 @@ public class UserEntity {
             return this;
         }
 
-        public UserEntityBuilder setName(String name) {
-            this.name = name;
-            return this;
-        }
-
         public UserEntityBuilder setStatus(Status status) {
             this.status = status;
             return this;
@@ -179,7 +161,7 @@ public class UserEntity {
         }
 
         public UserEntity build() {
-            return new UserEntity(uid, nickname, password, email, name, status, createdAt, updatedAt);
+            return new UserEntity(uid, nickname, password, email, status, createdAt, updatedAt);
         }
     }
 }

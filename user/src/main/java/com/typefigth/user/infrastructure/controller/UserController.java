@@ -62,7 +62,6 @@ public class UserController {
         user.setNickname(body.getNickname());
         user.setPassword(body.getPassword());
         user.setEmail(body.getEmail());
-        user.setName(body.getName());
 
         return ResponseEntity.status(HttpStatus.OK).body(userMapper.fromUser(this.userServices.createUser(user)));
     }
@@ -92,7 +91,6 @@ public class UserController {
 
         if (body.getNickname() != null) userDb.setNickname(body.getNickname());
         if (body.getEmail() != null) userDb.setEmail(body.getEmail());
-        if (body.getName() != null) userDb.setName(body.getName());
         if (body.getPassword() != null) userDb.setPassword(body.getPassword());
         if (body.getStatus() != null) userDb.setStatus(body.getStatus());
 
